@@ -1,0 +1,587 @@
+openapi: 3.0.3
+info:
+  title: Vacation Timeline API
+  description: |
+    Backend API for the Staffbase Vacation Timeline Widget.
+
+    This API provides endpoints for:
+    - Fetching vacation events from Microsoft Graph calendars
+    - Managing time-off requests (create, approve, reject)
+    - Health monitoring
+
+    ## Authentication
+
+    All endpoints (except `/health`) require API key authentication via the `x-api-key` header.
+
+    ## Error Responses
+
+    All error responses follow this format:
+    ```json
+    {
+      "error": {
+        "code": "ERROR_CODE",
+        "message": "Human-readable error message"
+      }
+    }
+    ```
+  version: 1.0.0
+  contact:
+    name: Beutech Support
+    email: support@beutech.com
+
+servers:
+  - url: https://{functionAppName}.azurewebsites.net/api
+    description: Azure Functions (Production)
+    variables:
+      functionAppName:
+        default: func-vacationtimeline-prod
+  - url: http://localhost:7071/api
+    description: Local Development
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Vacations
+    description: Vacation event operations
+  - name: Requests
+    description: Time-off request management
+  - name: Health
+    description: Health monitoring
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Returns the health status of the API and its dependencies.
+      operationId: getHealth
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service is healthy or degraded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: healthy
+                version: 1.0.0
+                timestamp: '2025-01-15T10:30:00Z'
+                uptime: 3600
+                checks:
+                  config:
+                    status: ok
+                    latencyMs: 2
+                  database:
+                    status: ok
+                    latencyMs: 15
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /vacations:
+    get:
+      summary: Get vacation events
+      description: |
+        Retrieves vacation events from the configured calendar(s) for the specified date range.
+
+        In **shared** calendar mode, events are fetched from a single shared calendar.
+        In **perUser** mode, events are fetched from each user's personal calendar.
+      operationId: getVacations
+      tags:
+        - Vacations
+      parameters:
+        - name: start
+          in: query
+          description: Start date (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2025-01-01'
+        - name: end
+          in: query
+          description: End date (YYYY-MM-DD)
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2025-01-31'
+        - name: view
+          in: query
+          description: View type (affects date range validation)
+          schema:
+            type: string
+            enum: [week, month, quarter]
+            default: month
+        - name: users
+          in: query
+          description: Comma-separated list of user emails (optional filter)
+          schema:
+            type: string
+            example: 'john@example.com,jane@example.com'
+        - name: timezone
+          in: query
+          description: Timezone for date interpretation
+          schema:
+            type: string
+            default: UTC
+            example: America/New_York
+      responses:
+        '200':
+          description: Vacation events retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VacationsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /vacations/next:
+    get:
+      summary: Get next vacation event
+      description: Returns the date of the next upcoming vacation event.
+      operationId: getNextVacation
+      tags:
+        - Vacations
+      responses:
+        '200':
+          description: Next event date
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nextEventDate:
+                    type: string
+                    format: date
+                    nullable: true
+                    example: '2025-02-15'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /requests:
+    get:
+      summary: List time-off requests
+      description: |
+        Retrieves time-off requests based on the caller's role.
+
+        - **requester**: Returns requests submitted by the user
+        - **supervisor**: Returns requests pending approval by the user
+      operationId: listRequests
+      tags:
+        - Requests
+      parameters:
+        - name: email
+          in: query
+          description: User email address
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: role
+          in: query
+          description: Role for filtering
+          required: true
+          schema:
+            type: string
+            enum: [requester, supervisor]
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [pending, approved, rejected, all]
+            default: all
+        - name: limit
+          in: query
+          description: Maximum number of results
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          description: Number of results to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Requests retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TimeOffRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: Create time-off request
+      description: Submits a new time-off request for approval.
+      operationId: createRequest
+      tags:
+        - Requests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequestInput'
+            example:
+              requesterEmail: john@example.com
+              requesterName: John Doe
+              startDate: '2025-03-01'
+              endDate: '2025-03-05'
+              leaveType: vacation
+              reason: Family vacation
+      responses:
+        '201':
+          description: Request created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOffRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /requests/{id}/approve:
+    post:
+      summary: Approve time-off request
+      description: |
+        Approves a pending time-off request.
+        Only the assigned supervisor can approve.
+        Creates a calendar event upon approval.
+      operationId: approveRequest
+      tags:
+        - Requests
+      parameters:
+        - name: id
+          in: path
+          description: Request UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - supervisorEmail
+              properties:
+                supervisorEmail:
+                  type: string
+                  format: email
+                  description: Email of the approving supervisor
+      responses:
+        '200':
+          description: Request approved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request:
+                    $ref: '#/components/schemas/TimeOffRequest'
+                  calendarEventId:
+                    type: string
+                    description: ID of the created calendar event
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /requests/{id}/reject:
+    post:
+      summary: Reject time-off request
+      description: |
+        Rejects a pending time-off request.
+        Only the assigned supervisor can reject.
+      operationId: rejectRequest
+      tags:
+        - Requests
+      parameters:
+        - name: id
+          in: path
+          description: Request UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - supervisorEmail
+              properties:
+                supervisorEmail:
+                  type: string
+                  format: email
+                reason:
+                  type: string
+                  description: Reason for rejection
+                  maxLength: 500
+      responses:
+        '200':
+          description: Request rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOffRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for authentication
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        version:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: integer
+          description: Uptime in seconds
+        checks:
+          type: object
+          properties:
+            config:
+              $ref: '#/components/schemas/CheckResult'
+            database:
+              $ref: '#/components/schemas/CheckResult'
+
+    CheckResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        latencyMs:
+          type: integer
+        error:
+          type: string
+
+    VacationsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/VacationEvent'
+        meta:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+            generatedAt:
+              type: string
+              format: date-time
+
+    VacationEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        isAllDay:
+          type: boolean
+        userId:
+          type: string
+        userName:
+          type: string
+        categories:
+          type: array
+          items:
+            type: string
+
+    TimeOffRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        requesterEmail:
+          type: string
+          format: email
+        requesterName:
+          type: string
+        supervisorEmail:
+          type: string
+          format: email
+        supervisorName:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        leaveType:
+          type: string
+          enum: [vacation, sick, personal, other]
+        reason:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        statusChangedAt:
+          type: string
+          format: date-time
+          nullable: true
+        statusChangedBy:
+          type: string
+          nullable: true
+        calendarEventId:
+          type: string
+          nullable: true
+        rejectionReason:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateRequestInput:
+      type: object
+      required:
+        - requesterEmail
+        - requesterName
+        - startDate
+        - endDate
+      properties:
+        requesterEmail:
+          type: string
+          format: email
+        requesterName:
+          type: string
+          maxLength: 255
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        leaveType:
+          type: string
+          enum: [vacation, sick, personal, other]
+          default: vacation
+        reason:
+          type: string
+          maxLength: 1000
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Start date must be in YYYY-MM-DD format
+
+    Unauthorized:
+      description: Missing or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Missing API key. Include x-api-key header.
+
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: FORBIDDEN
+              message: You are not authorized to approve this request
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: NOT_FOUND
+              message: Time-off request not found

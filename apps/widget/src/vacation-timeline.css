@@ -1,0 +1,830 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Main styles for the VacationTimeline widget.
+ * Beutech Design System
+ */
+
+/* ==========================================================================
+   Design System Variables
+   ========================================================================== */
+:root {
+  /* Primary brand colors - Beutech orange (refined palette) */
+  --bt-primary-50: #fff8f1;
+  --bt-primary-100: #feecdc;
+  --bt-primary-200: #fcd9bd;
+  --bt-primary-300: #fdba74;
+  --bt-primary-400: #fb923c;
+  --bt-primary-500: #f97316;
+  --bt-primary-600: #ea580c;
+  --bt-primary-700: #c2410c;
+  --bt-primary-800: #9a3412;
+  --bt-primary-900: #7c2d12;
+
+  /* Brand accent (main interactive color) */
+  --bt-brand: #f97316;
+  --bt-brand-hover: #ea580c;
+  --bt-brand-active: #c2410c;
+  --bt-brand-light: #fff8f1;
+  --bt-brand-foreground: #ffffff;
+
+  /* Neutral grays - refined for better contrast */
+  --bt-gray-50: #fafafa;
+  --bt-gray-100: #f5f5f5;
+  --bt-gray-200: #e5e5e5;
+  --bt-gray-300: #d4d4d4;
+  --bt-gray-400: #a3a3a3;
+  --bt-gray-500: #737373;
+  --bt-gray-600: #525252;
+  --bt-gray-700: #404040;
+  --bt-gray-800: #262626;
+  --bt-gray-900: #171717;
+
+  /* Semantic colors */
+  --bt-background: #ffffff;
+  --bt-foreground: #171717;
+  --bt-muted: #f5f5f5;
+  --bt-muted-foreground: #525252;
+  --bt-border: #e5e5e5;
+  --bt-border-hover: #d4d4d4;
+  --bt-border-focus: var(--bt-brand);
+
+  /* Status colors (WCAG AA compliant) */
+  --bt-success: #047857;
+  --bt-success-hover: #065f46;
+  --bt-success-light: #d1fae5;
+  --bt-warning: #b45309;
+  --bt-warning-light: #fef3c7;
+  --bt-error: #dc2626;
+  --bt-error-hover: #b91c1c;
+  --bt-error-light: #fef2f2;
+  --bt-error-border: #fecaca;
+  --bt-info: var(--bt-brand);
+  --bt-info-light: var(--bt-brand-light);
+
+  /* Enhanced shadows for depth */
+  --bt-shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --bt-shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --bt-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.06), 0 4px 6px -1px rgb(0 0 0 / 0.08);
+  --bt-shadow-md: 0 4px 8px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --bt-shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+  --bt-shadow-xl: 0 20px 40px -10px rgb(0 0 0 / 0.15), 0 8px 16px -8px rgb(0 0 0 / 0.1);
+  --bt-shadow-focus: 0 0 0 3px rgb(249 115 22 / 0.2);
+  --bt-shadow-focus-error: 0 0 0 3px rgb(220 38 38 / 0.2);
+
+  /* Border radius - slightly larger for modern feel */
+  --bt-radius-xs: 4px;
+  --bt-radius-sm: 6px;
+  --bt-radius: 8px;
+  --bt-radius-md: 10px;
+  --bt-radius-lg: 14px;
+  --bt-radius-xl: 20px;
+  --bt-radius-full: 9999px;
+
+  /* Typography - refined scale */
+  --bt-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bt-font-mono: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
+
+  --bt-text-xs: 11px;
+  --bt-text-sm: 12px;
+  --bt-text-base: 13px;
+  --bt-text-md: 14px;
+  --bt-text-lg: 16px;
+  --bt-text-xl: 18px;
+  --bt-text-2xl: 20px;
+
+  --bt-leading-tight: 1.25;
+  --bt-leading-normal: 1.5;
+  --bt-leading-relaxed: 1.625;
+
+  /* Spacing - expanded scale */
+  --bt-space-0: 0;
+  --bt-space-px: 1px;
+  --bt-space-0-5: 2px;
+  --bt-space-1: 4px;
+  --bt-space-1-5: 6px;
+  --bt-space-2: 8px;
+  --bt-space-2-5: 10px;
+  --bt-space-3: 12px;
+  --bt-space-4: 16px;
+  --bt-space-5: 20px;
+  --bt-space-6: 24px;
+  --bt-space-8: 32px;
+  --bt-space-10: 40px;
+  --bt-space-12: 48px;
+
+  /* Transitions - smooth and natural */
+  --bt-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --bt-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --bt-transition-fast: 120ms var(--bt-ease-out);
+  --bt-transition: 180ms var(--bt-ease-out);
+  --bt-transition-slow: 280ms var(--bt-ease-out);
+  --bt-transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ==========================================================================
+   Dark Mode Theme
+   ========================================================================== */
+.vt-widget--dark {
+  /* Dark mode semantic colors */
+  --bt-background: #1a1a1a;
+  --bt-foreground: #f5f5f5;
+  --bt-muted: #2a2a2a;
+  --bt-muted-foreground: #a3a3a3;
+  --bt-border: #333333;
+  --bt-border-hover: #444444;
+
+  /* Inverted grays for dark mode */
+  --bt-gray-50: #171717;
+  --bt-gray-100: #1a1a1a;
+  --bt-gray-200: #262626;
+  --bt-gray-300: #333333;
+  --bt-gray-400: #525252;
+  --bt-gray-500: #737373;
+  --bt-gray-600: #a3a3a3;
+  --bt-gray-700: #d4d4d4;
+  --bt-gray-800: #e5e5e5;
+  --bt-gray-900: #f5f5f5;
+
+  /* Brand colors (slightly adjusted for dark backgrounds) */
+  --bt-brand: #fb923c;
+  --bt-brand-hover: #f97316;
+  --bt-brand-active: #ea580c;
+  --bt-brand-light: #2a2015;
+  --bt-brand-foreground: #1a1a1a;
+
+  /* Primary colors adjusted for dark mode */
+  --bt-primary-50: #1f1510;
+  --bt-primary-100: #2a1a12;
+  --bt-primary-200: #3d2515;
+  --bt-primary-700: #fdba74;
+  --bt-primary-800: #fed7aa;
+
+  /* Status colors adjusted for dark mode (better contrast) */
+  --bt-success: #34d399;
+  --bt-success-hover: #10b981;
+  --bt-success-light: #052e1f;
+  --bt-warning: #fbbf24;
+  --bt-warning-light: #2d2005;
+  --bt-error: #f87171;
+  --bt-error-hover: #ef4444;
+  --bt-error-light: #2d0f0f;
+  --bt-error-border: #5c2020;
+  --bt-info: var(--bt-brand);
+  --bt-info-light: var(--bt-brand-light);
+
+  /* Enhanced shadows for dark mode */
+  --bt-shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --bt-shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+  --bt-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.3), 0 4px 6px -1px rgb(0 0 0 / 0.25);
+  --bt-shadow-md: 0 4px 8px -2px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+  --bt-shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+  --bt-shadow-xl: 0 20px 40px -10px rgb(0 0 0 / 0.6), 0 8px 16px -8px rgb(0 0 0 / 0.4);
+  --bt-shadow-focus: 0 0 0 3px rgb(251 146 60 / 0.3);
+  --bt-shadow-focus-error: 0 0 0 3px rgb(248 113 113 / 0.3);
+
+  /* Dark mode border styling */
+  border-color: var(--bt-border);
+  box-shadow: var(--bt-shadow), 0 0 0 1px rgb(255 255 255 / 0.03);
+}
+
+/* Dark mode specific component overrides */
+.vt-widget--dark .vt-header__view-btn:hover:not(.vt-header__view-btn--active) {
+  background-color: rgb(255 255 255 / 0.1);
+}
+
+.vt-widget--dark .vt-header__view-toggle {
+  background-color: var(--bt-gray-200);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.2);
+}
+
+.vt-widget--dark .vt-header__btn--today {
+  background-color: var(--bt-foreground);
+  border-color: var(--bt-foreground);
+  color: var(--bt-background);
+}
+
+.vt-widget--dark .vt-header__btn--today:hover {
+  background-color: var(--bt-gray-700);
+  border-color: var(--bt-gray-700);
+}
+
+/* Dark mode tabs override */
+.vt-widget--dark .vt-tabs {
+  background: linear-gradient(180deg, #222222 0%, #1a1a1a 100%);
+  border-bottom-color: #333333;
+}
+
+.vt-widget--dark .vt-tabs__tab--active {
+  background: #2a2a2a;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+}
+
+/* Dark mode cards and content areas */
+.vt-widget--dark .vt-request-card,
+.vt-widget--dark .vt-approval-card {
+  background: #222222;
+  border-color: #333333;
+}
+
+.vt-widget--dark .vt-request-card:hover,
+.vt-widget--dark .vt-approval-card:hover {
+  border-color: #444444;
+}
+
+/* Dark mode calendar */
+.vt-widget--dark .vt-calendar__day {
+  border-color: #333333;
+}
+
+.vt-widget--dark .vt-calendar__day:hover {
+  background: #262626;
+}
+
+.vt-widget--dark .vt-calendar__day--today {
+  background: #2a2015;
+}
+
+.vt-widget--dark .vt-calendar__weekday {
+  background: #222222;
+  color: #a3a3a3;
+}
+
+/* Dark mode header */
+.vt-widget--dark .vt-header {
+  background: #1a1a1a;
+  border-bottom-color: #333333;
+}
+
+.vt-widget--dark .vt-header__btn {
+  background: #222222;
+  border-color: #333333;
+  color: #f5f5f5;
+}
+
+.vt-widget--dark .vt-header__btn:hover {
+  background: #2a2a2a;
+  border-color: #444444;
+}
+
+/* Dark mode modal */
+.vt-widget--dark .vt-modal__overlay {
+  background: rgb(0 0 0 / 0.7);
+}
+
+.vt-widget--dark .vt-modal__content {
+  background: #1a1a1a;
+  border-color: #333333;
+}
+
+.vt-widget--dark .vt-modal__header {
+  border-bottom-color: #333333;
+}
+
+.vt-widget--dark .vt-modal__footer {
+  border-top-color: #333333;
+  background: #222222;
+}
+
+/* Dark mode form inputs */
+.vt-widget--dark input,
+.vt-widget--dark select,
+.vt-widget--dark textarea {
+  background: #222222;
+  border-color: #333333;
+  color: #f5f5f5;
+}
+
+.vt-widget--dark input:focus,
+.vt-widget--dark select:focus,
+.vt-widget--dark textarea:focus {
+  border-color: #fb923c;
+}
+
+/* ==========================================================================
+   Widget Container
+   ========================================================================== */
+.vt-widget {
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+
+  /* Visual styling - refined with subtle depth */
+  background-color: var(--bt-background);
+  border-radius: var(--bt-radius-lg);
+  border: 1px solid var(--bt-border);
+  box-shadow: var(--bt-shadow), 0 0 0 1px rgb(0 0 0 / 0.02);
+  overflow: hidden;
+
+  /* Typography - optimized for readability */
+  font-family: var(--bt-font-sans);
+  font-size: var(--bt-text-base);
+  line-height: var(--bt-leading-normal);
+  color: var(--bt-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  /* Reset */
+  box-sizing: border-box;
+  position: relative;
+}
+
+.vt-widget *,
+.vt-widget *::before,
+.vt-widget *::after {
+  box-sizing: border-box;
+}
+
+.vt-widget--error {
+  justify-content: center;
+  align-items: center;
+}
+
+/* ==========================================================================
+   Content Area
+   ========================================================================== */
+.vt-widget__content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* ==========================================================================
+   Focus Styles - Elegant, accessible focus indicators
+   ========================================================================== */
+
+/* Remove default browser focus ring */
+.vt-widget *:focus {
+  outline: none;
+}
+
+/* Modern focus-visible styles for keyboard navigation */
+.vt-widget button:focus-visible,
+.vt-widget [role="tab"]:focus-visible,
+.vt-widget [role="option"]:focus-visible,
+.vt-widget a:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+  border-radius: inherit;
+}
+
+.vt-widget input:focus-visible,
+.vt-widget select:focus-visible,
+.vt-widget textarea:focus-visible {
+  outline: none;
+  border-color: var(--bt-brand);
+  box-shadow: var(--bt-shadow-focus);
+}
+
+/* Firefox focus ring fix */
+.vt-widget button::-moz-focus-inner {
+  border: 0;
+}
+
+/* Override browser accent color for form elements */
+.vt-widget {
+  accent-color: var(--bt-brand);
+}
+
+/* Remove any browser autofill styling */
+.vt-widget input:-webkit-autofill,
+.vt-widget input:-webkit-autofill:hover,
+.vt-widget input:-webkit-autofill:focus,
+.vt-widget button:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--bt-background) inset;
+  box-shadow: 0 0 0 1000px var(--bt-background) inset;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+.vt-widget h1,
+.vt-widget h2,
+.vt-widget h3,
+.vt-widget h4 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+/* ==========================================================================
+   Button Reset - Override ALL browser default styles
+   ========================================================================== */
+.vt-widget button {
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.vt-widget button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Active state for pressed buttons */
+.vt-widget button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Remove webkit tap highlight */
+.vt-widget button,
+.vt-widget a,
+.vt-widget input,
+.vt-widget select,
+.vt-widget textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Disable Chrome's date/phone detection */
+.vt-widget {
+  -webkit-text-size-adjust: 100%;
+}
+
+.vt-widget a[href^="tel"],
+.vt-widget a[href^="mailto"],
+.vt-widget a[x-apple-data-detectors] {
+  color: inherit !important;
+  text-decoration: inherit !important;
+  background: none !important;
+}
+
+/* ==========================================================================
+   Responsive - Medium screens
+   ========================================================================== */
+@media (max-width: 480px) {
+  .vt-widget {
+    font-size: 12px;
+  }
+}
+
+/* ==========================================================================
+   Responsive - Ultra compact (300px width / 400px height)
+   ========================================================================== */
+@media (max-width: 350px) {
+  .vt-widget {
+    font-size: 11px;
+    border-radius: var(--bt-radius);
+  }
+}
+
+@media (max-height: 450px) {
+  .vt-widget {
+    min-height: 150px;
+  }
+}
+
+/* ==========================================================================
+   Tabs Navigation - Modern pill-style tabs
+   ========================================================================== */
+.vt-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-1-5);
+  padding: var(--bt-space-2-5) var(--bt-space-3);
+  border-bottom: 1px solid var(--bt-border);
+  background: linear-gradient(180deg, var(--bt-muted) 0%, var(--bt-background) 100%);
+  flex-shrink: 0;
+  /* Prevent tabs from spreading too far on wide screens */
+  max-width: 100%;
+}
+
+/* Keep tabs grouped on wide screens */
+@media (min-width: 1200px) {
+  .vt-tabs__spacer {
+    flex: 0 1 auto;
+    min-width: var(--bt-space-4);
+    max-width: var(--bt-space-8);
+  }
+}
+
+.vt-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bt-space-1-5);
+  padding: var(--bt-space-2) var(--bt-space-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--bt-radius);
+  font-size: var(--bt-text-base);
+  font-weight: 500;
+  color: var(--bt-muted-foreground);
+  cursor: pointer;
+  transition: all var(--bt-transition);
+  white-space: nowrap;
+  position: relative;
+}
+
+.vt-tabs__icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+  transition: opacity var(--bt-transition);
+}
+
+.vt-tabs__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vt-tabs__tab:hover {
+  background: var(--bt-background);
+  color: var(--bt-foreground);
+}
+
+.vt-tabs__tab:hover .vt-tabs__icon {
+  opacity: 1;
+}
+
+.vt-tabs__tab--active {
+  background: var(--bt-background);
+  color: var(--bt-foreground);
+  box-shadow: var(--bt-shadow-sm), 0 0 0 1px rgb(0 0 0 / 0.03);
+  font-weight: 600;
+}
+
+.vt-tabs__tab--active .vt-tabs__icon {
+  opacity: 1;
+}
+
+.vt-tabs__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: var(--bt-text-xs);
+  font-weight: 600;
+  border-radius: var(--bt-radius-full);
+  letter-spacing: 0.01em;
+}
+
+.vt-tabs__badge--pending {
+  background: var(--bt-warning-light);
+  color: var(--bt-warning);
+}
+
+.vt-tabs__badge--approvals {
+  background: var(--bt-brand);
+  color: var(--bt-brand-foreground);
+  box-shadow: 0 1px 2px rgb(249 115 22 / 0.3);
+}
+
+.vt-tabs__spacer {
+  flex: 1;
+}
+
+/* Primary action button - Outline style */
+.vt-tabs__request-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bt-space-1-5);
+  padding: var(--bt-space-2) var(--bt-space-4);
+  background: var(--bt-background);
+  border: 1.5px solid var(--bt-brand);
+  border-radius: var(--bt-radius);
+  font-size: var(--bt-text-sm);
+  font-weight: 600;
+  color: var(--bt-brand);
+  cursor: pointer;
+  transition: all var(--bt-transition);
+  box-shadow: none;
+}
+
+.vt-tabs__request-btn:hover:not(:disabled) {
+  background: var(--bt-brand-light);
+  border-color: var(--bt-brand-hover);
+  color: var(--bt-brand-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgb(249 115 22 / 0.15);
+}
+
+.vt-tabs__request-btn:active:not(:disabled) {
+  background: var(--bt-primary-100);
+  border-color: var(--bt-brand-active);
+  color: var(--bt-brand-active);
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.vt-tabs__request-btn:focus-visible {
+  box-shadow: var(--bt-shadow-focus);
+}
+
+.vt-tabs__request-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Responsive tabs - Tablet */
+@media (max-width: 520px) {
+  .vt-tabs {
+    flex-wrap: wrap;
+    padding: var(--bt-space-2);
+    gap: var(--bt-space-1);
+  }
+
+  .vt-tabs__spacer {
+    display: none;
+  }
+
+  .vt-tabs__request-btn {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: var(--bt-space-2);
+    /* Less prominent on mobile - use outline style */
+    background: var(--bt-background);
+    color: var(--bt-brand);
+    border: 1px solid var(--bt-brand);
+    box-shadow: none;
+  }
+
+  .vt-tabs__request-btn:hover:not(:disabled) {
+    background: var(--bt-brand-light);
+  }
+
+  .vt-tabs__tab {
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+  }
+}
+
+/* Responsive tabs - Mobile */
+@media (max-width: 380px) {
+  .vt-tabs {
+    padding: var(--bt-space-1);
+  }
+
+  .vt-tabs__tab {
+    padding: var(--bt-space-2) var(--bt-space-1);
+    font-size: 11px;
+  }
+
+  .vt-tabs__badge {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 9px;
+  }
+
+  .vt-tabs__request-btn {
+    font-size: 12px;
+    padding: var(--bt-space-2);
+  }
+
+  .vt-tabs__request-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Responsive tabs - Ultra Small */
+@media (max-width: 320px) {
+  .vt-tabs__tab {
+    font-size: 10px;
+    padding: var(--bt-space-1);
+  }
+
+  /* Hide text labels on very small screens, show icons only */
+  .vt-tabs__text {
+    display: none;
+  }
+
+  .vt-tabs__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .vt-tabs__request-btn {
+    font-size: 11px;
+  }
+
+  .vt-tabs__request-btn .vt-tabs__text {
+    display: inline; /* Keep button text visible */
+  }
+}
+
+/* ==========================================================================
+   Touch Enhancements
+   ========================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  .vt-tabs__tab {
+    min-height: 44px;
+    padding: var(--bt-space-2) var(--bt-space-3);
+  }
+
+  .vt-tabs__request-btn {
+    min-height: 44px;
+  }
+
+  /* Active states for touch feedback */
+  .vt-tabs__tab:active {
+    background: var(--bt-gray-200);
+  }
+
+  .vt-tabs__tab--active:active {
+    background: var(--bt-background);
+  }
+
+  .vt-tabs__request-btn:active:not(:disabled) {
+    background: var(--bt-primary-100);
+    transform: scale(0.98);
+  }
+}
+
+/* ==========================================================================
+   Safe Area Support
+   ========================================================================== */
+@supports (padding: max(0px)) {
+  .vt-widget {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .vt-widget *,
+  .vt-widget *::before,
+  .vt-widget *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+@media (prefers-contrast: high) {
+  .vt-widget {
+    border-width: 2px;
+  }
+
+  .vt-tabs__tab--active {
+    border: 2px solid var(--bt-foreground);
+  }
+
+  .vt-btn {
+    border-width: 2px;
+  }
+}
+
+/* ==========================================================================
+   Dark Mode Support (Future)
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  /* Dark mode variables can be added here */
+}
+
+/* ==========================================================================
+   FINAL: Remove ALL focus outlines - Maximum specificity override
+   ========================================================================== */
+.vt-widget button,
+.vt-widget button:focus,
+.vt-widget button:focus-visible,
+.vt-widget button:focus-within,
+.vt-widget button:active,
+.vt-widget .vt-tabs__tab,
+.vt-widget .vt-tabs__tab:focus,
+.vt-widget .vt-tabs__tab:focus-visible,
+.vt-widget .vt-tabs__tab:focus-within,
+.vt-widget .vt-tabs__tab:active,
+.vt-widget .vt-tabs__tab--active,
+.vt-widget .vt-tabs__tab--active:focus,
+.vt-widget .vt-tabs__tab--active:focus-visible,
+.vt-widget input,
+.vt-widget input:focus,
+.vt-widget input:focus-visible,
+.vt-widget select,
+.vt-widget select:focus,
+.vt-widget select:focus-visible,
+.vt-widget textarea,
+.vt-widget textarea:focus,
+.vt-widget textarea:focus-visible,
+.vt-widget [role="tab"],
+.vt-widget [role="tab"]:focus,
+.vt-widget [role="tab"]:focus-visible {
+  outline: 0 !important;
+  outline: none !important;
+  outline-width: 0px !important;
+  outline-style: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+}

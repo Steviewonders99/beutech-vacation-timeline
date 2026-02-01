@@ -1,0 +1,429 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for MyRequests component
+ */
+
+/* ==========================================================================
+   Container
+   ========================================================================== */
+.vt-my-requests {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.vt-my-requests__header {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-2);
+  padding: var(--bt-space-3) var(--bt-space-4);
+  border-bottom: 1px solid var(--bt-border);
+}
+
+.vt-my-requests__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+/* Push refresh button next to title, not to far right */
+.vt-my-requests__header .vt-btn--icon {
+  margin-left: 0;
+}
+
+.vt-btn--icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--bt-radius);
+  color: var(--bt-muted-foreground);
+  cursor: pointer;
+  transition: all var(--bt-transition-fast);
+}
+
+.vt-btn--icon:hover {
+  background: var(--bt-muted);
+  color: var(--bt-foreground);
+}
+
+.vt-btn--icon:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+}
+
+/* ==========================================================================
+   List
+   ========================================================================== */
+.vt-my-requests__list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--bt-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-space-3);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Request Card
+   ========================================================================== */
+.vt-request-card {
+  background: var(--bt-background);
+  border: 1px solid var(--bt-border);
+  border-radius: var(--bt-radius-lg);
+  padding: var(--bt-space-3);
+  transition: border-color var(--bt-transition-fast);
+  overflow: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.vt-request-card:hover {
+  border-color: var(--bt-gray-300);
+}
+
+.vt-request-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--bt-space-2);
+}
+
+.vt-request-card__type {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+/* ==========================================================================
+   Status Badge
+   ========================================================================== */
+.vt-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.vt-status--pending {
+  background: var(--bt-warning-light, #fef3c7);
+  color: var(--bt-warning, #b45309);
+}
+
+.vt-status--approved {
+  background: var(--bt-success-light, #d1fae5);
+  color: var(--bt-success, #047857);
+}
+
+.vt-status--rejected {
+  background: var(--bt-error-light, #fee2e2);
+  color: var(--bt-error);
+}
+
+.vt-status--cancelled {
+  background: var(--bt-muted);
+  color: var(--bt-muted-foreground);
+}
+
+/* ==========================================================================
+   Card Content
+   ========================================================================== */
+.vt-request-card__dates {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-2);
+  font-size: 13px;
+  color: var(--bt-foreground);
+  margin-bottom: var(--bt-space-2);
+}
+
+.vt-request-card__dates svg {
+  color: var(--bt-muted-foreground);
+  flex-shrink: 0;
+}
+
+.vt-request-card__days {
+  color: var(--bt-muted-foreground);
+}
+
+.vt-request-card__reason {
+  font-size: 12px;
+  color: var(--bt-muted-foreground);
+  margin-bottom: var(--bt-space-2);
+  padding: var(--bt-space-2);
+  background: var(--bt-muted);
+  border-radius: var(--bt-radius);
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.vt-request-card__reason-label {
+  font-weight: 500;
+  color: var(--bt-foreground);
+}
+
+.vt-request-card__rejection {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bt-space-2);
+  padding: var(--bt-space-2);
+  background: var(--bt-error-light, #fef2f2);
+  border: 1px solid var(--bt-error-border, #fecaca);
+  border-radius: var(--bt-radius);
+  font-size: 12px;
+  color: var(--bt-error);
+  margin-bottom: var(--bt-space-2);
+}
+
+.vt-request-card__rejection svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.vt-request-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--bt-space-2);
+  border-top: 1px solid var(--bt-border);
+  font-size: 11px;
+  color: var(--bt-muted-foreground);
+}
+
+.vt-request-card__supervisor {
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Empty State
+   ========================================================================== */
+.vt-my-requests__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8);
+  text-align: center;
+  color: var(--bt-muted-foreground);
+}
+
+.vt-my-requests__empty svg {
+  margin-bottom: var(--bt-space-4);
+  opacity: 0.5;
+}
+
+.vt-my-requests__empty h3 {
+  margin: 0 0 var(--bt-space-2);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+.vt-my-requests__empty p {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* ==========================================================================
+   Loading State
+   ========================================================================== */
+.vt-my-requests__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8);
+  gap: var(--bt-space-3);
+  color: var(--bt-muted-foreground);
+  font-size: 13px;
+}
+
+.vt-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--bt-border);
+  border-top-color: var(--bt-brand);
+  border-radius: 50%;
+  animation: vt-spin 0.8s linear infinite;
+}
+
+@keyframes vt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Error State
+   ========================================================================== */
+.vt-my-requests__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8);
+  gap: var(--bt-space-3);
+  text-align: center;
+}
+
+.vt-my-requests__error svg {
+  color: var(--bt-error);
+}
+
+.vt-my-requests__error span {
+  font-size: 13px;
+  color: var(--bt-error);
+}
+
+/* ==========================================================================
+   Responsive - Tablet
+   ========================================================================== */
+@media (max-width: 520px) {
+  .vt-my-requests__header {
+    padding: var(--bt-space-2) var(--bt-space-3);
+  }
+
+  .vt-my-requests__title {
+    font-size: 14px;
+  }
+
+  .vt-my-requests__list {
+    padding: var(--bt-space-3);
+    gap: var(--bt-space-2);
+  }
+
+  .vt-request-card {
+    padding: var(--bt-space-3);
+  }
+
+  .vt-request-card__type {
+    font-size: 13px;
+  }
+
+  .vt-request-card__dates {
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+
+  .vt-request-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--bt-space-1);
+  }
+}
+
+/* ==========================================================================
+   Responsive - Mobile
+   ========================================================================== */
+@media (max-width: 380px) {
+  .vt-my-requests__header {
+    padding: var(--bt-space-2);
+  }
+
+  .vt-my-requests__title {
+    font-size: 13px;
+  }
+
+  .vt-my-requests__list {
+    padding: var(--bt-space-2);
+  }
+
+  .vt-request-card {
+    padding: var(--bt-space-2);
+  }
+
+  .vt-request-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--bt-space-1);
+  }
+
+  .vt-status {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .vt-request-card__reason {
+    padding: var(--bt-space-1);
+    font-size: 11px;
+  }
+
+  .vt-request-card__rejection {
+    font-size: 11px;
+  }
+
+  .vt-request-card__footer {
+    font-size: 10px;
+  }
+}
+
+/* ==========================================================================
+   Touch Enhancements
+   ========================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  .vt-request-card {
+    /* Active state for touch */
+    transition: transform var(--bt-transition-fast), border-color var(--bt-transition-fast);
+  }
+
+  .vt-request-card:active {
+    transform: scale(0.98);
+  }
+
+  .vt-btn--icon {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ==========================================================================
+   Pull to Refresh Indicator
+   ========================================================================== */
+.vt-my-requests__pull-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-2);
+  color: var(--bt-muted-foreground);
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   Empty State Responsive
+   ========================================================================== */
+@media (max-width: 380px) {
+  .vt-my-requests__empty {
+    padding: var(--bt-space-4);
+  }
+
+  .vt-my-requests__empty svg {
+    width: 36px;
+    height: 36px;
+  }
+
+  .vt-my-requests__empty h3 {
+    font-size: 14px;
+  }
+
+  .vt-my-requests__empty p {
+    font-size: 12px;
+  }
+}

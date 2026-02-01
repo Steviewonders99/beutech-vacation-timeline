@@ -1,0 +1,193 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Erneut versuchen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "close": "Schließen",
+    "submit": "Absenden",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "today": "Heute",
+    "all": "Alle",
+    "none": "Keine",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "clear": "Löschen",
+    "yes": "Ja",
+    "no": "Nein",
+    "me": "Ich"
+  },
+  "tabs": {
+    "calendar": "Kalender",
+    "myRequests": "Meine Anträge",
+    "approvals": "Genehmigungen"
+  },
+  "views": {
+    "day": "Tag",
+    "week": "Woche",
+    "month": "Monat",
+    "timeline": "Zeitleiste"
+  },
+  "calendar": {
+    "weekdays": {
+      "sunday": "So",
+      "monday": "Mo",
+      "tuesday": "Di",
+      "wednesday": "Mi",
+      "thursday": "Do",
+      "friday": "Fr",
+      "saturday": "Sa"
+    },
+    "weekdaysFull": {
+      "sunday": "Sonntag",
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag"
+    },
+    "months": {
+      "january": "Januar",
+      "february": "Februar",
+      "march": "März",
+      "april": "April",
+      "may": "Mai",
+      "june": "Juni",
+      "july": "Juli",
+      "august": "August",
+      "september": "September",
+      "october": "Oktober",
+      "november": "November",
+      "december": "Dezember"
+    },
+    "monthsShort": {
+      "january": "Jan",
+      "february": "Feb",
+      "march": "Mär",
+      "april": "Apr",
+      "may": "Mai",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Aug",
+      "september": "Sep",
+      "october": "Okt",
+      "november": "Nov",
+      "december": "Dez"
+    },
+    "navigation": {
+      "previousPeriod": "Vorheriger Zeitraum",
+      "nextPeriod": "Nächster Zeitraum",
+      "goToToday": "Zum heutigen Tag"
+    },
+    "noEvents": "Keine Termine geplant",
+    "moreEvents": "+{{count}} weitere",
+    "allDay": "Ganztägig",
+    "openInOutlook": "In Outlook öffnen"
+  },
+  "filter": {
+    "label": "Filtern nach:",
+    "allUsers": "Alle Benutzer",
+    "selectUser": "Benutzer auswählen",
+    "noUsersFound": "Keine Benutzer gefunden"
+  },
+  "legend": {
+    "title": "Legende",
+    "hide": "Legende ausblenden",
+    "show": "Legende anzeigen"
+  },
+  "requests": {
+    "title": "Meine Anträge",
+    "newRequest": "Neuer Antrag",
+    "noRequests": "Keine Urlaubsanträge",
+    "noRequestsDescription": "Sie haben noch keine Urlaubsanträge eingereicht.",
+    "submittedOn": "Eingereicht am {{date}}",
+    "supervisor": "Vorgesetzter: {{name}}",
+    "reason": "Grund:",
+    "rejectionReason": "Ablehnungsgrund:",
+    "status": {
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "cancelled": "Storniert"
+    },
+    "days": "{{count}} Tag",
+    "days_plural": "{{count}} Tage"
+  },
+  "approvals": {
+    "title": "Ausstehende Genehmigungen",
+    "count": "{{count}} ausstehend",
+    "noApprovals": "Alles erledigt!",
+    "noApprovalsDescription": "Es gibt keine ausstehenden Urlaubsanträge zur Überprüfung.",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "approving": "Wird genehmigt...",
+    "rejecting": "Wird abgelehnt...",
+    "rejectReason": "Ablehnungsgrund (optional)",
+    "rejectReasonPlaceholder": "Grund für die Ablehnung eingeben...",
+    "confirmReject": "Ablehnung bestätigen",
+    "cancelReject": "Abbrechen"
+  },
+  "modal": {
+    "title": "Urlaub beantragen",
+    "requester": "Antragsteller",
+    "supervisor": "Vorgesetzter",
+    "autoAssigned": "Automatisch aus Ihrem Profil zugewiesen",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "leaveType": "Urlaubsart",
+    "reason": "Grund",
+    "reasonPlaceholder": "Kurze Beschreibung Ihres Urlaubs...",
+    "optional": "(optional)",
+    "required": "*",
+    "submit": "Antrag einreichen",
+    "submitting": "Wird eingereicht...",
+    "leaveTypes": {
+      "vacation": "Urlaub",
+      "sick": "Krankheit",
+      "personal": "Persönlicher Tag",
+      "bereavement": "Trauerfall",
+      "other": "Sonstiges"
+    },
+    "errors": {
+      "startDateRequired": "Startdatum ist erforderlich",
+      "endDateRequired": "Enddatum ist erforderlich",
+      "endDateBeforeStart": "Enddatum muss nach dem Startdatum liegen",
+      "submitFailed": "Antrag konnte nicht eingereicht werden. Bitte versuchen Sie es erneut."
+    },
+    "success": "Ihr Urlaubsantrag wurde erfolgreich eingereicht."
+  },
+  "errors": {
+    "configIncomplete": "Widget-Konfiguration ist unvollständig",
+    "configMissing": "Bitte kontaktieren Sie Ihren Administrator zur Konfiguration des Widgets.",
+    "loadingFailed": "Urlaubsdaten konnten nicht geladen werden",
+    "networkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.",
+    "unauthorized": "Nicht autorisiert. Bitte überprüfen Sie Ihren API-Schlüssel.",
+    "serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+    "unknown": "Ein unerwarteter Fehler ist aufgetreten"
+  },
+  "empty": {
+    "title": "Kein Urlaub gefunden",
+    "description": "Für diesen Zeitraum sind keine Urlaube geplant."
+  },
+  "loading": {
+    "calendar": "Kalender wird geladen...",
+    "requests": "Anträge werden geladen...",
+    "approvals": "Genehmigungen werden geladen...",
+    "user": "Benutzerinformationen werden geladen..."
+  },
+  "accessibility": {
+    "closeModal": "Dialog schließen",
+    "previousMonth": "Zum vorherigen Monat",
+    "nextMonth": "Zum nächsten Monat",
+    "selectDate": "Datum auswählen",
+    "eventDetails": "Termindetails für {{name}}",
+    "approvalCard": "Urlaubsantrag von {{name}}"
+  }
+}

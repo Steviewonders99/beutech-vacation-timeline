@@ -1,0 +1,193 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "submit": "Soumettre",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "today": "Aujourd'hui",
+    "all": "Tous",
+    "none": "Aucun",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "clear": "Effacer",
+    "yes": "Oui",
+    "no": "Non",
+    "me": "Moi"
+  },
+  "tabs": {
+    "calendar": "Calendrier",
+    "myRequests": "Mes demandes",
+    "approvals": "Approbations"
+  },
+  "views": {
+    "day": "Jour",
+    "week": "Semaine",
+    "month": "Mois",
+    "timeline": "Chronologie"
+  },
+  "calendar": {
+    "weekdays": {
+      "sunday": "Dim",
+      "monday": "Lun",
+      "tuesday": "Mar",
+      "wednesday": "Mer",
+      "thursday": "Jeu",
+      "friday": "Ven",
+      "saturday": "Sam"
+    },
+    "weekdaysFull": {
+      "sunday": "Dimanche",
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi"
+    },
+    "months": {
+      "january": "Janvier",
+      "february": "Février",
+      "march": "Mars",
+      "april": "Avril",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre",
+      "december": "Décembre"
+    },
+    "monthsShort": {
+      "january": "Jan",
+      "february": "Fév",
+      "march": "Mar",
+      "april": "Avr",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juil",
+      "august": "Août",
+      "september": "Sep",
+      "october": "Oct",
+      "november": "Nov",
+      "december": "Déc"
+    },
+    "navigation": {
+      "previousPeriod": "Période précédente",
+      "nextPeriod": "Période suivante",
+      "goToToday": "Aller à aujourd'hui"
+    },
+    "noEvents": "Aucun événement prévu",
+    "moreEvents": "+{{count}} de plus",
+    "allDay": "Toute la journée",
+    "openInOutlook": "Ouvrir dans Outlook"
+  },
+  "filter": {
+    "label": "Filtrer par:",
+    "allUsers": "Tous les utilisateurs",
+    "selectUser": "Sélectionner un utilisateur",
+    "noUsersFound": "Aucun utilisateur trouvé"
+  },
+  "legend": {
+    "title": "Légende",
+    "hide": "Masquer la légende",
+    "show": "Afficher la légende"
+  },
+  "requests": {
+    "title": "Mes demandes",
+    "newRequest": "Nouvelle demande",
+    "noRequests": "Aucune demande de congé",
+    "noRequestsDescription": "Vous n'avez pas encore soumis de demande de congé.",
+    "submittedOn": "Soumis le {{date}}",
+    "supervisor": "Superviseur: {{name}}",
+    "reason": "Motif:",
+    "rejectionReason": "Motif du refus:",
+    "status": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Refusé",
+      "cancelled": "Annulé"
+    },
+    "days": "{{count}} jour",
+    "days_plural": "{{count}} jours"
+  },
+  "approvals": {
+    "title": "Approbations en attente",
+    "count": "{{count}} en attente",
+    "noApprovals": "Tout est à jour!",
+    "noApprovalsDescription": "Il n'y a pas de demandes de congé en attente à examiner.",
+    "approve": "Approuver",
+    "reject": "Refuser",
+    "approving": "Approbation en cours...",
+    "rejecting": "Refus en cours...",
+    "rejectReason": "Motif du refus (optionnel)",
+    "rejectReasonPlaceholder": "Entrez le motif du refus...",
+    "confirmReject": "Confirmer le refus",
+    "cancelReject": "Annuler"
+  },
+  "modal": {
+    "title": "Demander un congé",
+    "requester": "Demandeur",
+    "supervisor": "Superviseur",
+    "autoAssigned": "Attribué automatiquement depuis votre profil",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "leaveType": "Type de congé",
+    "reason": "Motif",
+    "reasonPlaceholder": "Brève description de votre congé...",
+    "optional": "(optionnel)",
+    "required": "*",
+    "submit": "Soumettre la demande",
+    "submitting": "Soumission en cours...",
+    "leaveTypes": {
+      "vacation": "Vacances",
+      "sick": "Congé maladie",
+      "personal": "Jour personnel",
+      "bereavement": "Congé de deuil",
+      "other": "Autre"
+    },
+    "errors": {
+      "startDateRequired": "La date de début est requise",
+      "endDateRequired": "La date de fin est requise",
+      "endDateBeforeStart": "La date de fin doit être postérieure à la date de début",
+      "submitFailed": "Échec de la soumission. Veuillez réessayer."
+    },
+    "success": "Votre demande de congé a été soumise avec succès."
+  },
+  "errors": {
+    "configIncomplete": "Configuration du widget incomplète",
+    "configMissing": "Veuillez contacter votre administrateur pour configurer le widget.",
+    "loadingFailed": "Échec du chargement des données de congés",
+    "networkError": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "unauthorized": "Non autorisé. Veuillez vérifier votre clé API.",
+    "serverError": "Erreur serveur. Veuillez réessayer plus tard.",
+    "unknown": "Une erreur inattendue s'est produite"
+  },
+  "empty": {
+    "title": "Aucun congé trouvé",
+    "description": "Aucun congé n'est prévu pour cette période."
+  },
+  "loading": {
+    "calendar": "Chargement du calendrier...",
+    "requests": "Chargement des demandes...",
+    "approvals": "Chargement des approbations...",
+    "user": "Chargement des informations utilisateur..."
+  },
+  "accessibility": {
+    "closeModal": "Fermer le dialogue",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "selectDate": "Sélectionner une date",
+    "eventDetails": "Détails de l'événement pour {{name}}",
+    "approvalCard": "Demande de congé de {{name}}"
+  }
+}

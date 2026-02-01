@@ -1,0 +1,580 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for Timeline and TimelineRow components - Beutech Design System
+ */
+
+.vt-timeline {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background-color: var(--bt-background);
+}
+
+/* Header */
+.vt-timeline__header {
+  display: flex;
+  border-bottom: 1px solid var(--bt-border);
+  background-color: var(--bt-muted);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.vt-timeline__user-column {
+  width: 140px;
+  min-width: 140px;
+  padding: var(--bt-space-2) var(--bt-space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-2);
+  border-right: 1px solid var(--bt-border);
+  background-color: inherit;
+}
+
+.vt-timeline__user-header {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bt-muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vt-timeline__dates {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.vt-timeline__date-cell {
+  flex: 1;
+  min-width: 44px;
+  padding: var(--bt-space-2) var(--bt-space-1);
+  text-align: center;
+  border-right: 1px solid var(--bt-gray-100);
+}
+
+.vt-timeline__date-cell:last-child {
+  border-right: none;
+}
+
+.vt-timeline__date-cell--today {
+  background-color: var(--bt-primary-50);
+}
+
+.vt-timeline__date-day {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bt-muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vt-timeline__date-num {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+  margin-top: 2px;
+}
+
+.vt-timeline__date-cell--today .vt-timeline__date-day,
+.vt-timeline__date-cell--today .vt-timeline__date-num {
+  color: var(--bt-primary-700);
+}
+
+/* Body */
+.vt-timeline__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Row */
+.vt-timeline__row {
+  display: flex;
+  min-height: 40px;
+  border-bottom: 1px solid var(--bt-gray-100);
+  transition: background-color var(--bt-transition-fast);
+}
+
+.vt-timeline__row:hover {
+  background-color: var(--bt-gray-50);
+}
+
+.vt-timeline__row--current-user {
+  background-color: var(--bt-brand-light);
+}
+
+.vt-timeline__row--current-user:hover {
+  background-color: var(--bt-primary-100);
+}
+
+.vt-timeline__user-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.vt-timeline__user-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bt-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vt-timeline__me-indicator {
+  margin-left: var(--bt-space-1);
+  padding: 1px 4px;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--bt-primary-700);
+  background-color: var(--bt-primary-100);
+  border-radius: var(--bt-radius-full);
+}
+
+/* Events area */
+.vt-timeline__events-area {
+  flex: 1;
+  position: relative;
+  min-height: 40px;
+  padding: var(--bt-space-1) 0;
+}
+
+.vt-timeline__grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent,
+    transparent calc(100% / var(--column-count, 7) - 1px),
+    var(--bt-gray-100) calc(100% / var(--column-count, 7) - 1px),
+    var(--bt-gray-100) calc(100% / var(--column-count, 7))
+  );
+  pointer-events: none;
+}
+
+/* Event bar - polished with subtle gradient and depth */
+.vt-timeline__event-bar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 26px;
+  border-radius: var(--bt-radius-sm);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--bt-space-2);
+  font-size: var(--bt-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: var(--bt-shadow-sm), 0 0 0 1px rgb(0 0 0 / 0.04);
+  cursor: default;
+  transition: transform var(--bt-transition), box-shadow var(--bt-transition);
+  z-index: 1;
+}
+
+.vt-timeline__event-bar:hover {
+  transform: translateY(-50%) scale(1.02);
+  box-shadow: var(--bt-shadow-md), 0 0 0 1px rgb(0 0 0 / 0.06);
+  z-index: 2;
+}
+
+.vt-timeline__event-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.1);
+}
+
+/* Today marker - prominent with glow effect */
+.vt-timeline__today-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--bt-brand) 0%, var(--bt-brand-hover) 100%);
+  z-index: 5;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgb(249 115 22 / 0.3);
+}
+
+.vt-timeline__today-marker::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: var(--bt-brand);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgb(249 115 22 / 0.15), 0 2px 4px rgb(0 0 0 / 0.1);
+}
+
+/* ==========================================================================
+   Month View - Vertical Calendar Grid with Continuous Event Bars
+   Pixel-perfect design with comfortable padding and seamless month flow
+   ========================================================================== */
+
+/* Calendar-specific custom properties for responsive event positioning */
+.vt-calendar {
+  --cal-day-num-height: 26px;
+  --cal-event-height: 18px;
+  --cal-event-gap: 4px;
+  --cal-event-offset-x: 4px;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--bt-background);
+  overflow: hidden;
+}
+
+.vt-calendar__header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--bt-border);
+  background-color: var(--bt-muted);
+  flex-shrink: 0;
+}
+
+.vt-calendar__weekday {
+  padding: 10px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bt-muted-foreground);
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 0.5px;
+  border-right: 1px solid var(--bt-gray-100);
+}
+
+.vt-calendar__weekday:last-child {
+  border-right: none;
+}
+
+.vt-calendar__grid {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: var(--bt-space-2);
+}
+
+.vt-calendar__week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  position: relative;
+  /* Dynamic height: day number (26px) + up to 3 events (3 * 22px = 66px) + padding (8px) = 100px */
+  min-height: 100px;
+  flex-shrink: 0;
+}
+
+/* Remove bottom border from last week row for seamless appearance */
+.vt-calendar__week:last-child .vt-calendar__day {
+  border-bottom: none;
+}
+
+.vt-calendar__day {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  border-right: 1px solid var(--bt-gray-100);
+  border-bottom: 1px solid var(--bt-gray-100);
+  min-height: 100px;
+  background-color: var(--bt-background);
+  transition: background-color var(--bt-transition-fast);
+}
+
+.vt-calendar__day:nth-child(7n) {
+  border-right: none;
+}
+
+/* Outside month days - softer treatment for seamless flow */
+.vt-calendar__day--outside {
+  background-color: var(--bt-gray-50);
+}
+
+.vt-calendar__day--outside .vt-calendar__day-num {
+  color: var(--bt-gray-400);
+}
+
+.vt-calendar__day--today {
+  background-color: var(--bt-primary-50);
+}
+
+.vt-calendar__day-num {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bt-foreground);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.vt-calendar__day-num--today {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -2px;
+  background-color: var(--bt-primary-600);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* Events layer - positioned over the week */
+.vt-calendar__events-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Continuous event bar - pixel-perfect positioning */
+.vt-calendar__event-bar {
+  position: absolute;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: auto;
+  cursor: default;
+  border-radius: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: transform var(--bt-transition-fast), box-shadow var(--bt-transition-fast);
+}
+
+.vt-calendar__event-bar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+
+.vt-calendar__event-bar--start {
+  border-top-left-radius: var(--bt-radius-sm);
+  border-bottom-left-radius: var(--bt-radius-sm);
+}
+
+.vt-calendar__event-bar--end {
+  border-top-right-radius: var(--bt-radius-sm);
+  border-bottom-right-radius: var(--bt-radius-sm);
+}
+
+.vt-calendar__event-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vt-calendar__more-indicator {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--bt-muted-foreground);
+  pointer-events: auto;
+  background-color: var(--bt-background);
+  padding: 1px 4px;
+  border-radius: var(--bt-radius-sm);
+}
+
+/* ==========================================================================
+   Responsive - Medium screens (tablets / smaller desktops)
+   ========================================================================== */
+@media (max-width: 600px) {
+  .vt-timeline__user-column {
+    width: 80px;
+    min-width: 80px;
+    padding: var(--bt-space-1) var(--bt-space-2);
+  }
+
+  .vt-timeline__user-name {
+    font-size: 10px;
+  }
+
+  .vt-timeline__date-cell {
+    min-width: 36px;
+    padding: var(--bt-space-1);
+  }
+
+  .vt-timeline__date-day {
+    font-size: 10px;
+  }
+
+  .vt-timeline__date-num {
+    font-size: 12px;
+  }
+
+  .vt-timeline__event-bar {
+    height: 20px;
+    font-size: 9px;
+  }
+
+  /* Calendar medium - update custom properties */
+  .vt-calendar {
+    --cal-day-num-height: 24px;
+    --cal-event-height: 16px;
+    --cal-event-gap: 3px;
+    --cal-event-offset-x: 3px;
+  }
+
+  .vt-calendar__weekday {
+    padding: 8px 4px;
+    font-size: 10px;
+  }
+
+  .vt-calendar__week {
+    min-height: 85px;
+  }
+
+  .vt-calendar__day {
+    padding: 4px 6px;
+    min-height: 85px;
+  }
+
+  .vt-calendar__day-num {
+    font-size: 12px;
+  }
+
+  .vt-calendar__day-num--today {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    margin: -1px;
+  }
+
+  .vt-calendar__event-bar {
+    height: var(--cal-event-height);
+    font-size: 10px;
+    padding: 0 4px;
+  }
+
+  .vt-calendar__more-indicator {
+    font-size: 9px;
+    padding: 1px 3px;
+  }
+}
+
+/* ==========================================================================
+   Ultra-Compact Mode (mobile / small widgets)
+   ========================================================================== */
+@media (max-width: 400px) {
+  /* Timeline compact */
+  .vt-timeline__user-column {
+    width: 60px;
+    min-width: 60px;
+    padding: var(--bt-space-1);
+  }
+
+  .vt-timeline__user-header {
+    font-size: 9px;
+  }
+
+  .vt-timeline__user-name {
+    font-size: 9px;
+  }
+
+  .vt-timeline__user-color {
+    width: 6px;
+    height: 6px;
+  }
+
+  .vt-timeline__date-cell {
+    min-width: 24px;
+    padding: 2px;
+  }
+
+  .vt-timeline__date-day {
+    font-size: 8px;
+  }
+
+  .vt-timeline__date-num {
+    font-size: 10px;
+  }
+
+  .vt-timeline__row {
+    min-height: 32px;
+  }
+
+  .vt-timeline__events-area {
+    min-height: 32px;
+  }
+
+  .vt-timeline__event-bar {
+    height: 18px;
+    font-size: 8px;
+    padding: 0 2px;
+  }
+
+  /* Calendar compact - update custom properties */
+  .vt-calendar {
+    --cal-day-num-height: 20px;
+    --cal-event-height: 14px;
+    --cal-event-gap: 2px;
+    --cal-event-offset-x: 2px;
+  }
+
+  .vt-calendar__weekday {
+    padding: 6px 2px;
+    font-size: 9px;
+    letter-spacing: 0;
+  }
+
+  .vt-calendar__week {
+    min-height: 68px;
+  }
+
+  .vt-calendar__day {
+    padding: 3px 4px;
+    min-height: 68px;
+  }
+
+  .vt-calendar__day-num {
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+
+  .vt-calendar__day-num--today {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    margin: -1px;
+  }
+
+  .vt-calendar__event-bar {
+    height: var(--cal-event-height);
+    font-size: 9px;
+    padding: 0 3px;
+  }
+
+  .vt-calendar__more-indicator {
+    font-size: 8px;
+    bottom: 2px;
+    right: 3px;
+    padding: 0 2px;
+  }
+}

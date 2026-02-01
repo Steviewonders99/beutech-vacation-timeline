@@ -1,0 +1,285 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+
+env:
+  NODE_VERSION: '20.11.0'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'apps/backend'
+  WIDGET_PATH: 'apps/widget'
+
+jobs:
+  # ============================================
+  # Build and Test
+  # ============================================
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run tests with coverage
+        run: npm test -- --coverage --coverageReporters=text-summary
+
+      - name: Build Backend
+        run: npm run build -w apps/backend
+
+      - name: Build Widget
+        run: npm run build -w apps/widget
+
+      - name: Upload Backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: apps/backend/dist
+          retention-days: 5
+
+      - name: Upload Widget artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: widget-dist
+          path: apps/widget/dist
+          retention-days: 5
+
+  # ============================================
+  # Deploy Backend to Azure Functions (Dev)
+  # ============================================
+  deploy-backend-dev:
+    name: Deploy Backend (Dev)
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: development
+      url: ${{ steps.deploy.outputs.webapp-url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Download Backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: apps/backend/dist
+
+      - name: Install Backend dependencies (production)
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        run: npm ci --omit=dev
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: Deploy to Azure Functions
+        id: deploy
+        uses: azure/functions-action@v1
+        with:
+          app-name: ${{ vars.AZURE_FUNCTIONAPP_NAME_DEV }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+      - name: Verify deployment health
+        run: |
+          FUNCTION_URL="https://${{ vars.AZURE_FUNCTIONAPP_NAME_DEV }}.azurewebsites.net"
+          for i in {1..10}; do
+            response=$(curl -s -o /dev/null -w "%{http_code}" "${FUNCTION_URL}/api/health" || echo "000")
+            if [ "$response" = "200" ]; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Attempt $i failed (status: $response), retrying in 5s..."
+            sleep 5
+          done
+          echo "Health check failed after 10 attempts"
+          exit 1
+
+  # ============================================
+  # Deploy Widget to Azure Storage (Dev)
+  # ============================================
+  deploy-widget-dev:
+    name: Deploy Widget (Dev)
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: development
+
+    steps:
+      - name: Download Widget artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: widget-dist
+          path: widget-dist
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: Upload to Azure Blob Storage
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az storage blob upload-batch \
+              --account-name ${{ vars.AZURE_STORAGE_ACCOUNT_DEV }} \
+              --destination '$web' \
+              --source widget-dist \
+              --overwrite \
+              --auth-mode login
+
+      - name: Purge CDN (if configured)
+        if: vars.AZURE_CDN_ENDPOINT_DEV != ''
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az cdn endpoint purge \
+              --resource-group ${{ vars.AZURE_RESOURCE_GROUP_DEV }} \
+              --profile-name ${{ vars.AZURE_CDN_PROFILE_DEV }} \
+              --name ${{ vars.AZURE_CDN_ENDPOINT_DEV }} \
+              --content-paths '/*'
+        continue-on-error: true
+
+  # ============================================
+  # Deploy Backend to Azure Functions (Prod)
+  # ============================================
+  deploy-backend-prod:
+    name: Deploy Backend (Prod)
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'prod'
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Download Backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: apps/backend/dist
+
+      - name: Install Backend dependencies (production)
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        run: npm ci --omit=dev
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Deploy to Azure Functions
+        id: deploy
+        uses: azure/functions-action@v1
+        with:
+          app-name: ${{ vars.AZURE_FUNCTIONAPP_NAME_PROD }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+      - name: Verify deployment health
+        run: |
+          FUNCTION_URL="https://${{ vars.AZURE_FUNCTIONAPP_NAME_PROD }}.azurewebsites.net"
+          for i in {1..10}; do
+            response=$(curl -s -o /dev/null -w "%{http_code}" "${FUNCTION_URL}/api/health" || echo "000")
+            if [ "$response" = "200" ]; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Attempt $i failed (status: $response), retrying in 5s..."
+            sleep 5
+          done
+          echo "Health check failed after 10 attempts"
+          exit 1
+
+  # ============================================
+  # Deploy Widget to Azure Storage (Prod)
+  # ============================================
+  deploy-widget-prod:
+    name: Deploy Widget (Prod)
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'prod'
+    environment: production
+
+    steps:
+      - name: Download Widget artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: widget-dist
+          path: widget-dist
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Upload to Azure Blob Storage
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az storage blob upload-batch \
+              --account-name ${{ vars.AZURE_STORAGE_ACCOUNT_PROD }} \
+              --destination '$web' \
+              --source widget-dist \
+              --overwrite \
+              --auth-mode login
+
+      - name: Purge CDN (if configured)
+        if: vars.AZURE_CDN_ENDPOINT_PROD != ''
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az cdn endpoint purge \
+              --resource-group ${{ vars.AZURE_RESOURCE_GROUP_PROD }} \
+              --profile-name ${{ vars.AZURE_CDN_PROFILE_PROD }} \
+              --name ${{ vars.AZURE_CDN_ENDPOINT_PROD }} \
+              --content-paths '/*'
+        continue-on-error: true

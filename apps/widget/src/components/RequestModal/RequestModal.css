@@ -1,0 +1,444 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for RequestModal component
+ */
+
+/* ==========================================================================
+   Modal Overlay
+   ========================================================================== */
+.vt-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: vt-fade-in 0.15s ease-out;
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Modal Container
+   ========================================================================== */
+.vt-modal {
+  background: var(--bt-background);
+  border-radius: var(--bt-radius-lg);
+  box-shadow: var(--bt-shadow-lg);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: vt-slide-up 0.2s ease-out;
+}
+
+@keyframes vt-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Modal Header
+   ========================================================================== */
+.vt-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--bt-space-4);
+  border-bottom: 1px solid var(--bt-border);
+}
+
+.vt-modal__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+.vt-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--bt-radius);
+  color: var(--bt-muted-foreground);
+  cursor: pointer;
+  transition: all var(--bt-transition-fast);
+}
+
+.vt-modal__close:hover {
+  background: var(--bt-muted);
+  color: var(--bt-foreground);
+}
+
+.vt-modal__close:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+}
+
+/* ==========================================================================
+   Modal Body
+   ========================================================================== */
+.vt-modal__body {
+  padding: var(--bt-space-4);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.vt-modal__form {
+  display: contents;
+}
+
+/* ==========================================================================
+   Form Elements
+   ========================================================================== */
+.vt-form-group {
+  margin-bottom: var(--bt-space-4);
+}
+
+.vt-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.vt-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--bt-space-3);
+}
+
+.vt-form-label {
+  display: block;
+  margin-bottom: var(--bt-space-1);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bt-foreground);
+}
+
+.vt-required {
+  color: var(--bt-error);
+}
+
+.vt-optional {
+  color: var(--bt-muted-foreground);
+  font-weight: 400;
+}
+
+.vt-form-static {
+  padding: 8px 12px;
+  background: var(--bt-muted);
+  border-radius: var(--bt-radius);
+  font-size: 13px;
+  color: var(--bt-muted-foreground);
+}
+
+.vt-form-input,
+.vt-form-select,
+.vt-form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bt-background);
+  border: 1px solid var(--bt-border);
+  border-radius: var(--bt-radius);
+  font-size: 13px;
+  color: var(--bt-foreground);
+  transition: all var(--bt-transition-fast);
+}
+
+.vt-form-input:focus,
+.vt-form-select:focus,
+.vt-form-textarea:focus {
+  outline: none;
+  border-color: var(--bt-brand);
+  box-shadow: var(--bt-shadow-focus);
+}
+
+.vt-form-input:focus-visible,
+.vt-form-select:focus-visible,
+.vt-form-textarea:focus-visible {
+  outline: none;
+  border-color: var(--bt-brand);
+  box-shadow: var(--bt-shadow-focus);
+}
+
+/* Override native date input focus styles */
+.vt-form-input[type="date"]:focus,
+.vt-form-input[type="date"]:focus-visible {
+  outline: none;
+  border-color: var(--bt-brand);
+  box-shadow: var(--bt-shadow-focus);
+}
+
+/* Override date picker calendar icon and internal elements */
+.vt-form-input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.vt-form-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Remove webkit date input inner styling */
+.vt-form-input[type="date"]::-webkit-datetime-edit,
+.vt-form-input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.vt-form-input[type="date"]::-webkit-datetime-edit-text,
+.vt-form-input[type="date"]::-webkit-datetime-edit-month-field,
+.vt-form-input[type="date"]::-webkit-datetime-edit-day-field,
+.vt-form-input[type="date"]::-webkit-datetime-edit-year-field {
+  color: var(--bt-foreground);
+}
+
+.vt-form-input[type="date"]::-webkit-datetime-edit-month-field:focus,
+.vt-form-input[type="date"]::-webkit-datetime-edit-day-field:focus,
+.vt-form-input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background-color: transparent;
+  outline: none;
+}
+
+.vt-form-input:disabled,
+.vt-form-select:disabled,
+.vt-form-textarea:disabled {
+  background: var(--bt-muted);
+  color: var(--bt-muted-foreground);
+  cursor: not-allowed;
+}
+
+.vt-form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.vt-form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.vt-form-error {
+  margin-top: var(--bt-space-3);
+  padding: var(--bt-space-3);
+  background: var(--bt-error-light, #fef2f2);
+  border: 1px solid var(--bt-error-border, #fecaca);
+  border-radius: var(--bt-radius);
+  font-size: 13px;
+  color: var(--bt-error);
+}
+
+/* ==========================================================================
+   Modal Footer
+   ========================================================================== */
+.vt-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--bt-space-2);
+  padding: var(--bt-space-4);
+  border-top: 1px solid var(--bt-border);
+  background: var(--bt-muted);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.vt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bt-space-1);
+  padding: 8px 16px;
+  border-radius: var(--bt-radius);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--bt-transition-fast);
+}
+
+.vt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vt-btn--primary {
+  background: var(--bt-brand);
+  border: 1px solid var(--bt-brand);
+  color: var(--bt-brand-foreground);
+}
+
+.vt-btn--primary:hover:not(:disabled) {
+  background: var(--bt-brand-hover);
+  border-color: var(--bt-brand-hover);
+}
+
+.vt-btn--primary:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+}
+
+.vt-btn--secondary {
+  background: var(--bt-background);
+  border: 1px solid var(--bt-border);
+  color: var(--bt-foreground);
+}
+
+.vt-btn--secondary:hover:not(:disabled) {
+  background: var(--bt-muted);
+  border-color: var(--bt-gray-300);
+}
+
+.vt-btn--secondary:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+}
+
+/* ==========================================================================
+   Responsive - Tablet
+   ========================================================================== */
+@media (max-width: 520px) {
+  .vt-modal {
+    max-width: calc(100% - 32px);
+    margin: 16px;
+  }
+
+  .vt-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .vt-modal__title {
+    font-size: 16px;
+  }
+
+  .vt-form-input,
+  .vt-form-select,
+  .vt-form-textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 12px;
+  }
+
+  .vt-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+/* ==========================================================================
+   Responsive - Mobile (Full Screen Modal)
+   ========================================================================== */
+@media (max-width: 420px) {
+  .vt-modal-overlay {
+    align-items: flex-end;
+  }
+
+  .vt-modal {
+    max-width: 100%;
+    max-height: 95vh;
+    margin: 0;
+    border-radius: var(--bt-radius-lg) var(--bt-radius-lg) 0 0;
+    animation: vt-slide-up-mobile 0.25s ease-out;
+  }
+
+  @keyframes vt-slide-up-mobile {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .vt-modal__header {
+    padding: var(--bt-space-3) var(--bt-space-4);
+  }
+
+  .vt-modal__body {
+    padding: var(--bt-space-3) var(--bt-space-4);
+  }
+
+  .vt-modal__footer {
+    padding: var(--bt-space-3) var(--bt-space-4);
+    padding-bottom: max(var(--bt-space-4), env(safe-area-inset-bottom));
+  }
+
+  .vt-form-group {
+    margin-bottom: var(--bt-space-3);
+  }
+
+  .vt-form-static {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
+
+/* ==========================================================================
+   Responsive - Ultra Small
+   ========================================================================== */
+@media (max-width: 320px) {
+  .vt-modal__title {
+    font-size: 15px;
+  }
+
+  .vt-form-label {
+    font-size: 12px;
+  }
+
+  .vt-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* ==========================================================================
+   Touch Enhancements
+   ========================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  .vt-modal__close {
+    width: 44px;
+    height: 44px;
+  }
+
+  .vt-form-input,
+  .vt-form-select,
+  .vt-form-textarea {
+    min-height: 44px;
+  }
+
+  .vt-btn {
+    min-height: 44px;
+  }
+}
+
+/* ==========================================================================
+   Safe Area Support (iPhone notch, etc.)
+   ========================================================================== */
+@supports (padding: max(0px)) {
+  .vt-modal__footer {
+    padding-bottom: max(var(--bt-space-4), env(safe-area-inset-bottom));
+  }
+}

@@ -1,0 +1,124 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for Loading, Error, and Empty state components - Beutech Design System
+ */
+
+/* Loading State */
+.vt-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8) var(--bt-space-6);
+  text-align: center;
+}
+
+.vt-loading__spinner {
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--bt-space-4);
+}
+
+.vt-loading__spinner-circle {
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--bt-gray-200);
+  border-top-color: var(--bt-primary-600);
+  border-radius: 50%;
+  animation: vt-spin 0.8s linear infinite;
+}
+
+@keyframes vt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vt-loading__message {
+  margin: 0;
+  color: var(--bt-muted-foreground);
+  font-size: 14px;
+}
+
+/* Error State */
+.vt-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8) var(--bt-space-6);
+  text-align: center;
+}
+
+.vt-error__icon {
+  color: var(--bt-error);
+  margin-bottom: var(--bt-space-4);
+}
+
+.vt-error__title {
+  margin: 0 0 var(--bt-space-2) 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+.vt-error__message {
+  margin: 0 0 var(--bt-space-4) 0;
+  color: var(--bt-muted-foreground);
+  font-size: 14px;
+  max-width: 320px;
+}
+
+.vt-error__retry-btn {
+  padding: var(--bt-space-2) var(--bt-space-4);
+  background-color: var(--bt-primary-600);
+  color: #fff;
+  border: none;
+  border-radius: var(--bt-radius);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--bt-transition-fast);
+}
+
+.vt-error__retry-btn:hover {
+  background-color: var(--bt-primary-700);
+}
+
+.vt-error__retry-btn:focus-visible {
+  outline: 2px solid var(--bt-primary-500);
+  outline-offset: 2px;
+}
+
+.vt-error__retry-btn:active {
+  background-color: var(--bt-primary-800);
+}
+
+/* Empty State */
+.vt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8) var(--bt-space-6);
+  text-align: center;
+}
+
+.vt-empty__icon {
+  color: var(--bt-gray-400);
+  margin-bottom: var(--bt-space-4);
+}
+
+.vt-empty__title {
+  margin: 0 0 var(--bt-space-2) 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+.vt-empty__message {
+  margin: 0;
+  color: var(--bt-muted-foreground);
+  font-size: 14px;
+  max-width: 320px;
+}

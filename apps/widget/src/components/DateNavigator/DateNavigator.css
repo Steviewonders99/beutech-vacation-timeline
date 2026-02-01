@@ -1,0 +1,76 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for DateNavigator component - Beutech Design System
+ */
+
+.vt-date-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bt-space-1);
+}
+
+.vt-date-nav__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-2) var(--bt-space-3);
+  background-color: var(--bt-background);
+  border: 1px solid var(--bt-border);
+  border-radius: var(--bt-radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bt-foreground);
+  cursor: pointer;
+  transition: all var(--bt-transition-fast);
+}
+
+.vt-date-nav__btn:hover {
+  background-color: var(--bt-muted);
+  border-color: var(--bt-gray-300);
+}
+
+.vt-date-nav__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+  z-index: 1;
+}
+
+.vt-date-nav__btn:active {
+  background-color: var(--bt-gray-200);
+}
+
+.vt-date-nav__btn--arrow {
+  padding: var(--bt-space-2);
+  color: var(--bt-muted-foreground);
+}
+
+.vt-date-nav__btn--arrow:hover {
+  color: var(--bt-foreground);
+}
+
+.vt-date-nav__btn--today {
+  background-color: var(--bt-primary-600);
+  border-color: var(--bt-primary-600);
+  color: #fff;
+}
+
+.vt-date-nav__btn--today:hover {
+  background-color: var(--bt-primary-700);
+  border-color: var(--bt-primary-700);
+}
+
+.vt-date-nav__btn--today:active {
+  background-color: var(--bt-primary-800);
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  .vt-date-nav__btn {
+    padding: var(--bt-space-1) var(--bt-space-2);
+    font-size: 12px;
+  }
+
+  .vt-date-nav__btn--arrow {
+    padding: var(--bt-space-1);
+  }
+}

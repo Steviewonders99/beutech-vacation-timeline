@@ -1,0 +1,489 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for ApprovalDashboard component
+ */
+
+/* ==========================================================================
+   Container
+   ========================================================================== */
+.vt-approval-dashboard {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.vt-approval-dashboard__header {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-2);
+  padding: var(--bt-space-3) var(--bt-space-4);
+  border-bottom: 1px solid var(--bt-border);
+}
+
+.vt-approval-dashboard__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-2);
+}
+
+/* Push refresh button next to title, not to far right */
+.vt-approval-dashboard__header .vt-btn--icon {
+  margin-left: 0;
+}
+
+.vt-approval-dashboard__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+.vt-approval-dashboard__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--bt-brand);
+  color: var(--bt-brand-foreground);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+/* ==========================================================================
+   List
+   ========================================================================== */
+.vt-approval-dashboard__list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--bt-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-space-3);
+}
+
+/* ==========================================================================
+   Approval Card
+   ========================================================================== */
+.vt-approval-card {
+  background: var(--bt-background);
+  border: 1px solid var(--bt-border);
+  border-radius: var(--bt-radius-lg);
+  padding: var(--bt-space-3);
+  transition: border-color var(--bt-transition-fast);
+}
+
+.vt-approval-card:hover {
+  border-color: var(--bt-gray-300);
+}
+
+.vt-approval-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--bt-space-3);
+}
+
+.vt-approval-card__requester {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-2);
+}
+
+.vt-approval-card__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--bt-brand);
+  color: var(--bt-brand-foreground);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.vt-approval-card__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.vt-approval-card__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+.vt-approval-card__email {
+  font-size: 12px;
+  color: var(--bt-muted-foreground);
+}
+
+.vt-approval-card__type {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--bt-muted);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bt-foreground);
+  border-radius: var(--bt-radius);
+}
+
+/* ==========================================================================
+   Card Content
+   ========================================================================== */
+.vt-approval-card__dates {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-2);
+  font-size: 13px;
+  color: var(--bt-foreground);
+  margin-bottom: var(--bt-space-2);
+}
+
+.vt-approval-card__dates svg {
+  color: var(--bt-muted-foreground);
+  flex-shrink: 0;
+}
+
+.vt-approval-card__days {
+  color: var(--bt-muted-foreground);
+}
+
+.vt-approval-card__reason {
+  font-size: 12px;
+  color: var(--bt-muted-foreground);
+  margin-bottom: var(--bt-space-2);
+  padding: var(--bt-space-2);
+  background: var(--bt-muted);
+  border-radius: var(--bt-radius);
+}
+
+.vt-approval-card__reason-label {
+  font-weight: 500;
+  color: var(--bt-foreground);
+}
+
+.vt-approval-card__submitted {
+  font-size: 11px;
+  color: var(--bt-muted-foreground);
+  margin-bottom: var(--bt-space-3);
+}
+
+/* ==========================================================================
+   Actions
+   ========================================================================== */
+.vt-approval-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--bt-space-2);
+  padding-top: var(--bt-space-3);
+  border-top: 1px solid var(--bt-border);
+}
+
+.vt-btn--success {
+  background: var(--bt-success, #047857);
+  border: 1px solid var(--bt-success, #047857);
+  color: #fff;
+}
+
+.vt-btn--success:hover:not(:disabled) {
+  background: var(--bt-success-hover, #065f46);
+  border-color: var(--bt-success-hover, #065f46);
+}
+
+.vt-btn--success:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(4 120 87 / 0.2);
+}
+
+.vt-btn--danger {
+  background: var(--bt-error);
+  border: 1px solid var(--bt-error);
+  color: #fff;
+}
+
+.vt-btn--danger:hover:not(:disabled) {
+  background: var(--bt-error-hover, #b91c1c);
+  border-color: var(--bt-error-hover, #b91c1c);
+}
+
+.vt-btn--danger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(220 38 38 / 0.2);
+}
+
+/* ==========================================================================
+   Reject Dialog
+   ========================================================================== */
+.vt-approval-card__reject-dialog {
+  padding-top: var(--bt-space-3);
+  border-top: 1px solid var(--bt-border);
+}
+
+.vt-approval-card__reject-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--bt-space-2);
+  margin-top: var(--bt-space-2);
+}
+
+/* ==========================================================================
+   Error
+   ========================================================================== */
+.vt-approval-card__error {
+  margin-top: var(--bt-space-2);
+  padding: var(--bt-space-2);
+  background: var(--bt-error-light, #fef2f2);
+  border: 1px solid var(--bt-error-border, #fecaca);
+  border-radius: var(--bt-radius);
+  font-size: 12px;
+  color: var(--bt-error);
+}
+
+/* ==========================================================================
+   Empty State
+   ========================================================================== */
+.vt-approval-dashboard__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8);
+  text-align: center;
+  color: var(--bt-muted-foreground);
+}
+
+.vt-approval-dashboard__empty svg {
+  margin-bottom: var(--bt-space-4);
+  color: var(--bt-success, #047857);
+  opacity: 0.7;
+}
+
+.vt-approval-dashboard__empty h3 {
+  margin: 0 0 var(--bt-space-2);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+}
+
+.vt-approval-dashboard__empty p {
+  margin: 0;
+  font-size: 13px;
+}
+
+/* ==========================================================================
+   Loading State
+   ========================================================================== */
+.vt-approval-dashboard__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8);
+  gap: var(--bt-space-3);
+  color: var(--bt-muted-foreground);
+  font-size: 13px;
+}
+
+/* ==========================================================================
+   Error State
+   ========================================================================== */
+.vt-approval-dashboard__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--bt-space-8);
+  gap: var(--bt-space-3);
+  text-align: center;
+}
+
+.vt-approval-dashboard__error svg {
+  color: var(--bt-error);
+}
+
+.vt-approval-dashboard__error span {
+  font-size: 13px;
+  color: var(--bt-error);
+}
+
+/* ==========================================================================
+   Responsive - Tablet
+   ========================================================================== */
+@media (max-width: 520px) {
+  .vt-approval-dashboard__header {
+    padding: var(--bt-space-2) var(--bt-space-3);
+  }
+
+  .vt-approval-dashboard__title {
+    font-size: 14px;
+  }
+
+  .vt-approval-dashboard__list {
+    padding: var(--bt-space-3);
+    gap: var(--bt-space-2);
+  }
+
+  .vt-approval-card {
+    padding: var(--bt-space-3);
+  }
+
+  .vt-approval-card__header {
+    flex-direction: column;
+    gap: var(--bt-space-2);
+  }
+
+  .vt-approval-card__type {
+    align-self: flex-start;
+  }
+
+  .vt-approval-card__dates {
+    flex-wrap: wrap;
+    font-size: 12px;
+  }
+
+  .vt-approval-card__actions {
+    flex-direction: column;
+  }
+
+  .vt-approval-card__actions .vt-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .vt-approval-card__reject-actions {
+    flex-direction: column;
+  }
+
+  .vt-approval-card__reject-actions .vt-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   Responsive - Mobile
+   ========================================================================== */
+@media (max-width: 380px) {
+  .vt-approval-dashboard__header {
+    padding: var(--bt-space-2);
+  }
+
+  .vt-approval-dashboard__title {
+    font-size: 13px;
+  }
+
+  .vt-approval-dashboard__count {
+    min-width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+
+  .vt-approval-dashboard__list {
+    padding: var(--bt-space-2);
+  }
+
+  .vt-approval-card {
+    padding: var(--bt-space-2);
+  }
+
+  .vt-approval-card__avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .vt-approval-card__name {
+    font-size: 13px;
+  }
+
+  .vt-approval-card__email {
+    font-size: 11px;
+  }
+
+  .vt-approval-card__type {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  .vt-approval-card__reason {
+    padding: var(--bt-space-1);
+    font-size: 11px;
+  }
+
+  .vt-btn--success,
+  .vt-btn--danger {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* ==========================================================================
+   Touch Enhancements
+   ========================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  .vt-approval-card {
+    transition: transform var(--bt-transition-fast), border-color var(--bt-transition-fast);
+  }
+
+  .vt-approval-card:active {
+    transform: scale(0.98);
+  }
+
+  .vt-btn--success,
+  .vt-btn--danger {
+    min-height: 44px;
+  }
+
+  .vt-approval-card__reject-dialog .vt-form-textarea {
+    font-size: 16px; /* Prevents iOS zoom */
+    min-height: 80px;
+  }
+}
+
+/* ==========================================================================
+   Swipe Actions (Future Enhancement)
+   ========================================================================== */
+.vt-approval-card--swipeable {
+  position: relative;
+  overflow: hidden;
+}
+
+.vt-approval-card__swipe-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all var(--bt-transition);
+}
+
+.vt-approval-card__swipe-approve,
+.vt-approval-card__swipe-reject {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.vt-approval-card__swipe-approve {
+  background: var(--bt-success, #047857);
+}
+
+.vt-approval-card__swipe-reject {
+  background: var(--bt-error);
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="vacation-timeline.svg">
+    <link rel="shortcut icon" href="vacation-timeline.svg">
+    <title>beutech/vacation-timeline</title>
+    <!-- locally stored versions of Staffbase frontend assets -->
+    <link href="/css/app.css" rel="stylesheet">
+    <link href="/css/libs.css" rel="stylesheet">
+    <link href="/css/font.css" rel="stylesheet">
+    <style>
+      body {
+        padding: 50px;
+      }
+      .box {
+        border: 2px dashed gray;
+        padding: 40px;
+      }
+    </style>
+  </head>
+  <body style="display: flex">
+    <div class="box" style="flex: 2">
+      <h3>Widget preview:</h3>
+      <br />
+      <br />
+      <section id="preview">
+            <vacation-timeline message="world!"></vacation-timeline>
+        </section>
+    </div>
+    <div id="config" style="flex: 1"></div>
+  </body>
+  <script src="bootstrap.js"></script>
+  <script src="beutech.vacation-timeline.js"></script>
+</html>

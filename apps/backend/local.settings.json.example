@@ -1,0 +1,30 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+
+    "// Azure AD App Registration (required)": "",
+    "TENANT_ID": "your-azure-tenant-id",
+    "CLIENT_ID": "your-app-client-id",
+    "CLIENT_SECRET": "your-app-client-secret",
+
+    "// Calendar Configuration": "",
+    "CALENDAR_MODE": "shared",
+    "VACATION_CALENDAR_MAILBOX": "vacations@yourcompany.com",
+    "VACATION_CATEGORY": "Vacation",
+
+    "// Security": "",
+    "API_KEY": "your-secure-api-key-here",
+    "ALLOWED_ORIGINS": "https://your-staffbase-domain.staffbase.com",
+
+    "// Optional Settings": "",
+    "MAX_DATE_RANGE_DAYS": "90",
+    "DEFAULT_TIMEZONE": "UTC",
+    "LOG_LEVEL": "info"
+  },
+  "Host": {
+    "CORS": "*",
+    "CORSCredentials": false
+  }
+}

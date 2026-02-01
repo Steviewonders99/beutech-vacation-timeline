@@ -1,0 +1,59 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for ViewToggle component - shadcn-inspired segmented control
+ */
+
+.vt-view-toggle {
+  display: inline-flex;
+}
+
+.vt-view-toggle__track {
+  display: inline-flex;
+  padding: 2px;
+  background-color: var(--bt-muted);
+  border-radius: var(--bt-radius);
+  gap: 2px;
+}
+
+.vt-view-toggle__btn {
+  position: relative;
+  padding: var(--bt-space-2) var(--bt-space-3);
+  background-color: transparent;
+  border: none;
+  border-radius: calc(var(--bt-radius) - 2px);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bt-muted-foreground);
+  cursor: pointer;
+  transition: all var(--bt-transition-fast);
+  white-space: nowrap;
+}
+
+.vt-view-toggle__btn:hover:not(.vt-view-toggle__btn--active) {
+  color: var(--bt-foreground);
+}
+
+.vt-view-toggle__btn--active {
+  background-color: var(--bt-brand);
+  color: var(--bt-brand-foreground);
+  box-shadow: var(--bt-shadow-sm), 0 1px 3px rgb(249 115 22 / 0.25);
+  font-weight: 600;
+}
+
+.vt-view-toggle__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+  z-index: 1;
+}
+
+.vt-view-toggle__btn--active:focus-visible {
+  box-shadow: var(--bt-shadow-focus), var(--bt-shadow-sm);
+}
+
+/* Responsive - stack on small screens */
+@media (max-width: 400px) {
+  .vt-view-toggle__btn {
+    padding: var(--bt-space-1) var(--bt-space-2);
+    font-size: 12px;
+  }
+}

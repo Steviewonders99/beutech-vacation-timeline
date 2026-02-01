@@ -1,0 +1,456 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for CalendarHeader component - shadcn-style unified toolbar
+ */
+
+.vt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--bt-space-2) var(--bt-space-3);
+  border-bottom: 1px solid var(--bt-border);
+  background-color: var(--bt-background);
+  gap: var(--bt-space-3);
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Navigation Section (Left)
+   ========================================================================== */
+.vt-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-3);
+  flex-wrap: nowrap;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.vt-header__nav-arrows {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--bt-radius);
+  border: 1px solid var(--bt-border);
+  flex-shrink: 0;
+  background-color: var(--bt-background);
+}
+
+.vt-header__nav-arrows .vt-header__btn--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: var(--bt-background) !important;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.vt-header__nav-arrows .vt-header__btn--icon:first-child {
+  border-right: 1px solid var(--bt-border);
+  border-radius: calc(var(--bt-radius) - 1px) 0 0 calc(var(--bt-radius) - 1px);
+}
+
+.vt-header__nav-arrows .vt-header__btn--icon:last-child {
+  border-radius: 0 calc(var(--bt-radius) - 1px) calc(var(--bt-radius) - 1px) 0;
+}
+
+.vt-header__date-label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+  white-space: nowrap;
+  flex-shrink: 0;
+  /* Disable browser date detection styling */
+  -webkit-user-modify: read-only;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Date Dropdown (Day/Week/Month selector)
+   ========================================================================== */
+.vt-header__date-dropdown {
+  position: relative;
+}
+
+.vt-header__date-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bt-space-1);
+  padding: 6px 10px;
+  background-color: var(--bt-background);
+  border: 1px solid var(--bt-border);
+  border-radius: var(--bt-radius);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bt-foreground);
+  cursor: pointer;
+  transition: all var(--bt-transition-fast);
+  white-space: nowrap;
+}
+
+.vt-header__date-trigger:hover {
+  background-color: var(--bt-muted);
+  border-color: var(--bt-gray-300);
+}
+
+.vt-header__date-trigger:focus,
+.vt-header__date-trigger:focus-visible,
+.vt-header__date-trigger:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: var(--bt-background) !important;
+}
+
+.vt-header__date-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 180px;
+  max-height: 320px;
+  overflow-y: auto;
+  background-color: var(--bt-background);
+  border: 1px solid var(--bt-border);
+  border-radius: var(--bt-radius);
+  box-shadow: var(--bt-shadow-lg);
+  z-index: 100;
+}
+
+.vt-header__date-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bt-foreground);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--bt-transition-fast);
+}
+
+.vt-header__date-option:hover {
+  background-color: var(--bt-muted);
+}
+
+.vt-header__date-option--selected {
+  background-color: var(--bt-primary-50);
+  color: var(--bt-primary-700);
+  font-weight: 600;
+}
+
+.vt-header__date-option--selected:hover {
+  background-color: var(--bt-primary-100);
+}
+
+/* ==========================================================================
+   Actions Section (Right)
+   ========================================================================== */
+.vt-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-2);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Buttons - Base styles
+   ========================================================================== */
+.vt-header__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bt-space-1);
+  padding: 6px 12px;
+  background-color: var(--bt-background);
+  border: 1px solid var(--bt-border);
+  border-radius: var(--bt-radius);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bt-foreground);
+  cursor: pointer;
+  transition: all var(--bt-transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vt-header__btn:hover {
+  background-color: var(--bt-muted);
+  border-color: var(--bt-gray-300);
+}
+
+.vt-header__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+  z-index: 1;
+}
+
+.vt-header__btn:active {
+  background-color: var(--bt-gray-200);
+}
+
+/* Icon-only button */
+.vt-header__btn--icon {
+  padding: 6px;
+  border: none;
+  border-radius: 0;
+  color: var(--bt-muted-foreground);
+  min-width: 28px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vt-header__btn--icon:hover {
+  background-color: var(--bt-muted);
+  color: var(--bt-foreground);
+}
+
+/* Today button - Primary style - MUST NOT EXPAND */
+.vt-header__btn--today {
+  background-color: var(--bt-foreground);
+  border-color: var(--bt-foreground);
+  color: var(--bt-background);
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.vt-header__btn--today:hover {
+  background-color: var(--bt-gray-800);
+  border-color: var(--bt-gray-800);
+}
+
+.vt-header__btn--today:active {
+  background-color: var(--bt-gray-900);
+}
+
+/* Outlook button - Secondary brand action */
+.vt-header__btn--outlook {
+  background-color: var(--bt-brand);
+  border-color: var(--bt-brand);
+  color: var(--bt-brand-foreground);
+  box-shadow: 0 1px 2px rgb(249 115 22 / 0.2);
+}
+
+.vt-header__btn--outlook:hover {
+  background-color: var(--bt-brand-hover);
+  border-color: var(--bt-brand-hover);
+  box-shadow: 0 2px 4px rgb(249 115 22 / 0.25);
+}
+
+.vt-header__btn--outlook:active {
+  background-color: var(--bt-brand-active);
+}
+
+/* ==========================================================================
+   View Toggle - Modern segmented control
+   ========================================================================== */
+.vt-header__view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  background-color: var(--bt-muted);
+  border-radius: var(--bt-radius);
+  gap: 2px;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+.vt-header__view-btn {
+  position: relative;
+  padding: 6px 12px;
+  background-color: transparent;
+  border: none;
+  border-radius: calc(var(--bt-radius) - 2px);
+  font-size: var(--bt-text-sm);
+  font-weight: 500;
+  color: var(--bt-muted-foreground);
+  cursor: pointer;
+  transition: all var(--bt-transition);
+  white-space: nowrap;
+}
+
+.vt-header__view-btn:hover:not(.vt-header__view-btn--active) {
+  color: var(--bt-foreground);
+  background-color: rgb(255 255 255 / 0.5);
+}
+
+.vt-header__view-btn--active {
+  background-color: var(--bt-brand);
+  color: var(--bt-brand-foreground);
+  box-shadow: var(--bt-shadow-sm), 0 1px 3px rgb(249 115 22 / 0.25);
+  font-weight: 600;
+}
+
+.vt-header__view-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--bt-shadow-focus);
+  z-index: 1;
+}
+
+/* Ensure active state styling is preserved */
+.vt-header__view-btn--active,
+.vt-header__view-btn--active:focus,
+.vt-header__view-btn--active:active {
+  background-color: var(--bt-brand);
+  color: var(--bt-brand-foreground);
+  box-shadow: var(--bt-shadow-sm), 0 1px 3px rgb(249 115 22 / 0.25);
+}
+
+.vt-header__view-btn--active:focus-visible {
+  box-shadow: var(--bt-shadow-focus), var(--bt-shadow-sm);
+}
+
+/* ==========================================================================
+   Responsive - Medium screens
+   ========================================================================== */
+@media (max-width: 600px) {
+  .vt-header {
+    padding: var(--bt-space-2);
+    gap: var(--bt-space-2);
+  }
+
+  .vt-header__nav {
+    gap: var(--bt-space-2);
+  }
+
+  .vt-header__date-label {
+    font-size: 12px;
+  }
+
+  .vt-header__btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .vt-header__view-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .vt-header__outlook-text {
+    display: none;
+  }
+
+  .vt-header__btn--outlook {
+    padding: 6px;
+  }
+}
+
+/* ==========================================================================
+   Responsive - Ultra compact (300px)
+   ========================================================================== */
+@media (max-width: 350px) {
+  .vt-header {
+    padding: 6px 8px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .vt-header__nav {
+    flex: 1 1 100%;
+    justify-content: space-between;
+    gap: 4px;
+  }
+
+  .vt-header__actions {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .vt-header__btn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .vt-header__btn--icon {
+    padding: 4px;
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  .vt-header__btn--icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .vt-header__date-label {
+    font-size: 10px;
+  }
+
+  .vt-header__view-toggle {
+    padding: 1px;
+  }
+
+  .vt-header__view-btn {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  .vt-header__btn--outlook {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Touch Enhancements
+   ========================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  .vt-header__nav-arrows .vt-header__btn--icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .vt-header__btn {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+
+  .vt-header__btn--icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .vt-header__date-trigger {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+
+  .vt-header__date-option {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+
+  .vt-header__view-btn {
+    min-height: 36px;
+    padding: 8px 12px;
+  }
+
+  /* Active state feedback for touch */
+  .vt-header__btn:active {
+    transform: scale(0.95);
+  }
+
+  .vt-header__nav-arrows .vt-header__btn--icon:active {
+    background-color: var(--bt-gray-200) !important;
+  }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .vt-header__btn,
+  .vt-header__month-trigger,
+  .vt-header__month-option,
+  .vt-header__view-btn {
+    transition: none;
+  }
+}

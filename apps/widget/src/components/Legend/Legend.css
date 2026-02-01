@@ -1,0 +1,138 @@
+/*!
+ * Copyright 2024, Staffbase GmbH and contributors.
+ * Styles for Legend component - Beutech Design System
+ */
+
+.vt-legend {
+  padding: var(--bt-space-2) var(--bt-space-3);
+  background-color: var(--bt-muted);
+  border-top: 1px solid var(--bt-border);
+  flex-shrink: 0;
+}
+
+.vt-legend__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-1);
+  padding: var(--bt-space-1) var(--bt-space-2);
+  margin: calc(-1 * var(--bt-space-1)) calc(-1 * var(--bt-space-2));
+  background: none;
+  border: none;
+  border-radius: var(--bt-radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bt-muted-foreground);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color var(--bt-transition-fast);
+}
+
+.vt-legend__toggle:hover {
+  color: var(--bt-foreground);
+}
+
+.vt-legend__toggle:focus-visible {
+  outline: 2px solid var(--bt-primary-500);
+  outline-offset: 2px;
+}
+
+.vt-legend__toggle-icon {
+  transition: transform var(--bt-transition);
+}
+
+.vt-legend__toggle-icon--open {
+  transform: rotate(180deg);
+}
+
+.vt-legend__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bt-space-2) var(--bt-space-4);
+  margin-top: var(--bt-space-2);
+}
+
+.vt-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-space-1);
+}
+
+.vt-legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--bt-radius-sm);
+  flex-shrink: 0;
+}
+
+.vt-legend__name {
+  font-size: 11px;
+  color: var(--bt-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.vt-legend__me-badge {
+  margin-left: var(--bt-space-1);
+  padding: 1px 4px;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--bt-primary-700);
+  background-color: var(--bt-primary-100);
+  border-radius: var(--bt-radius-full);
+}
+
+/* ==========================================================================
+   Responsive - Medium screens
+   ========================================================================== */
+@media (max-width: 480px) {
+  .vt-legend {
+    padding: var(--bt-space-2);
+  }
+
+  .vt-legend__items {
+    gap: var(--bt-space-2) var(--bt-space-3);
+  }
+
+  .vt-legend__name {
+    font-size: 10px;
+    max-width: 80px;
+  }
+}
+
+/* ==========================================================================
+   Responsive - Ultra compact (300px)
+   ========================================================================== */
+@media (max-width: 350px) {
+  .vt-legend {
+    padding: 6px 8px;
+  }
+
+  .vt-legend__toggle {
+    font-size: 10px;
+    padding: 2px 4px;
+    margin: -2px -4px;
+  }
+
+  .vt-legend__items {
+    gap: 4px 8px;
+    margin-top: 6px;
+  }
+
+  .vt-legend__color {
+    width: 8px;
+    height: 8px;
+  }
+
+  .vt-legend__name {
+    font-size: 9px;
+    max-width: 60px;
+  }
+
+  .vt-legend__me-badge {
+    padding: 0 3px;
+    font-size: 8px;
+  }
+}

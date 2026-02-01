@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="vacation-timeline.svg">
+    <link rel="shortcut icon" href="vacation-timeline.svg">
+    <title>Vacation Timeline - Light Mode Demo</title>
+    <!-- locally stored versions of Staffbase frontend assets -->
+    <link href="/css/app.css" rel="stylesheet">
+    <link href="/css/libs.css" rel="stylesheet">
+    <link href="/css/font.css" rel="stylesheet">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+        padding: 40px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      .demo-header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #171717;
+      }
+      .demo-header h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        background: linear-gradient(90deg, #ea580c, #f97316);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .demo-header p {
+        font-size: 14px;
+        color: #525252;
+      }
+      .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        height: 600px;
+      }
+      .mode-toggle {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .mode-toggle a {
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .mode-toggle a.light {
+        background: #f97316;
+        color: #ffffff;
+        border: 1px solid #f97316;
+      }
+      .mode-toggle a.light:hover {
+        background: #ea580c;
+      }
+      .mode-toggle a.dark {
+        background: #262626;
+        color: #f5f5f5;
+        border: 1px solid #333333;
+      }
+      .mode-toggle a.dark:hover {
+        background: #171717;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-header">
+      <h1>Vacation Timeline</h1>
+      <p>Enterprise Vacation Management Widget - Light Mode</p>
+    </div>
+
+    <div class="mode-toggle">
+      <a href="demo-light.html" class="light">Light Mode</a>
+      <a href="demo-dark.html" class="dark">Dark Mode</a>
+    </div>
+
+    <div class="demo-container">
+      <vacation-timeline></vacation-timeline>
+    </div>
+  </body>
+  <script src="bootstrap.js"></script>
+  <script src="beutech.vacation-timeline.js"></script>
+</html>

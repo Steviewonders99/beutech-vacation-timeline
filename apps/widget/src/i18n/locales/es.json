@@ -1,0 +1,193 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Se ha producido un error",
+    "retry": "Reintentar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "close": "Cerrar",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "today": "Hoy",
+    "all": "Todos",
+    "none": "Ninguno",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clear": "Borrar",
+    "yes": "Sí",
+    "no": "No",
+    "me": "Yo"
+  },
+  "tabs": {
+    "calendar": "Calendario",
+    "myRequests": "Mis solicitudes",
+    "approvals": "Aprobaciones"
+  },
+  "views": {
+    "day": "Día",
+    "week": "Semana",
+    "month": "Mes",
+    "timeline": "Cronología"
+  },
+  "calendar": {
+    "weekdays": {
+      "sunday": "Dom",
+      "monday": "Lun",
+      "tuesday": "Mar",
+      "wednesday": "Mié",
+      "thursday": "Jue",
+      "friday": "Vie",
+      "saturday": "Sáb"
+    },
+    "weekdaysFull": {
+      "sunday": "Domingo",
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado"
+    },
+    "months": {
+      "january": "Enero",
+      "february": "Febrero",
+      "march": "Marzo",
+      "april": "Abril",
+      "may": "Mayo",
+      "june": "Junio",
+      "july": "Julio",
+      "august": "Agosto",
+      "september": "Septiembre",
+      "october": "Octubre",
+      "november": "Noviembre",
+      "december": "Diciembre"
+    },
+    "monthsShort": {
+      "january": "Ene",
+      "february": "Feb",
+      "march": "Mar",
+      "april": "Abr",
+      "may": "May",
+      "june": "Jun",
+      "july": "Jul",
+      "august": "Ago",
+      "september": "Sep",
+      "october": "Oct",
+      "november": "Nov",
+      "december": "Dic"
+    },
+    "navigation": {
+      "previousPeriod": "Período anterior",
+      "nextPeriod": "Período siguiente",
+      "goToToday": "Ir a hoy"
+    },
+    "noEvents": "No hay eventos programados",
+    "moreEvents": "+{{count}} más",
+    "allDay": "Todo el día",
+    "openInOutlook": "Abrir en Outlook"
+  },
+  "filter": {
+    "label": "Filtrar por:",
+    "allUsers": "Todos los usuarios",
+    "selectUser": "Seleccionar usuario",
+    "noUsersFound": "No se encontraron usuarios"
+  },
+  "legend": {
+    "title": "Leyenda",
+    "hide": "Ocultar leyenda",
+    "show": "Mostrar leyenda"
+  },
+  "requests": {
+    "title": "Mis solicitudes",
+    "newRequest": "Nueva solicitud",
+    "noRequests": "Sin solicitudes de ausencia",
+    "noRequestsDescription": "Aún no has enviado ninguna solicitud de ausencia.",
+    "submittedOn": "Enviado el {{date}}",
+    "supervisor": "Supervisor: {{name}}",
+    "reason": "Motivo:",
+    "rejectionReason": "Motivo del rechazo:",
+    "status": {
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "cancelled": "Cancelado"
+    },
+    "days": "{{count}} día",
+    "days_plural": "{{count}} días"
+  },
+  "approvals": {
+    "title": "Aprobaciones pendientes",
+    "count": "{{count}} pendientes",
+    "noApprovals": "¡Todo al día!",
+    "noApprovalsDescription": "No hay solicitudes de ausencia pendientes de revisión.",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "approving": "Aprobando...",
+    "rejecting": "Rechazando...",
+    "rejectReason": "Motivo del rechazo (opcional)",
+    "rejectReasonPlaceholder": "Introduce el motivo del rechazo...",
+    "confirmReject": "Confirmar rechazo",
+    "cancelReject": "Cancelar"
+  },
+  "modal": {
+    "title": "Solicitar ausencia",
+    "requester": "Solicitante",
+    "supervisor": "Supervisor",
+    "autoAssigned": "Asignado automáticamente desde tu perfil",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de fin",
+    "leaveType": "Tipo de ausencia",
+    "reason": "Motivo",
+    "reasonPlaceholder": "Breve descripción de tu ausencia...",
+    "optional": "(opcional)",
+    "required": "*",
+    "submit": "Enviar solicitud",
+    "submitting": "Enviando...",
+    "leaveTypes": {
+      "vacation": "Vacaciones",
+      "sick": "Baja por enfermedad",
+      "personal": "Día personal",
+      "bereavement": "Duelo",
+      "other": "Otro"
+    },
+    "errors": {
+      "startDateRequired": "La fecha de inicio es obligatoria",
+      "endDateRequired": "La fecha de fin es obligatoria",
+      "endDateBeforeStart": "La fecha de fin debe ser posterior a la fecha de inicio",
+      "submitFailed": "Error al enviar la solicitud. Por favor, inténtalo de nuevo."
+    },
+    "success": "Tu solicitud de ausencia se ha enviado correctamente."
+  },
+  "errors": {
+    "configIncomplete": "Configuración del widget incompleta",
+    "configMissing": "Por favor, contacta con tu administrador para configurar el widget.",
+    "loadingFailed": "Error al cargar los datos de ausencias",
+    "networkError": "Error de red. Por favor, comprueba tu conexión.",
+    "unauthorized": "No autorizado. Por favor, verifica tu clave API.",
+    "serverError": "Error del servidor. Por favor, inténtalo más tarde.",
+    "unknown": "Ha ocurrido un error inesperado"
+  },
+  "empty": {
+    "title": "No se encontraron ausencias",
+    "description": "No hay ausencias programadas para este período."
+  },
+  "loading": {
+    "calendar": "Cargando calendario...",
+    "requests": "Cargando solicitudes...",
+    "approvals": "Cargando aprobaciones...",
+    "user": "Cargando información del usuario..."
+  },
+  "accessibility": {
+    "closeModal": "Cerrar diálogo",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "selectDate": "Seleccionar fecha",
+    "eventDetails": "Detalles del evento para {{name}}",
+    "approvalCard": "Solicitud de ausencia de {{name}}"
+  }
+}
