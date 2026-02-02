@@ -12,7 +12,6 @@ import { graphPost } from '../graph/graphClient';
 import { Logger } from '../utils/logger';
 import { TimeOffRequest } from '../models/TimeOffRequest';
 import { generateActionUrls } from '../utils/actionToken';
-import { getConfig } from '../utils/env';
 
 /**
  * Email message structure for Graph API.
@@ -402,119 +401,27 @@ export async function sendTeamsAdaptiveCard(
   actionUrls?: { approveUrl: string; rejectUrl: string },
   logger?: Logger
 ): Promise<void> {
-  logger?.info('Sending Teams Adaptive Card', { userId, requestId: request.id });
+  logger?.info('Sending Teams notification', { userId, requestId: request.id });
 
   const dayCount = getDayCount(request.startDate, request.endDate);
   const dayWord = dayCount === 1 ? 'day' : 'days';
 
-  // Build actions array
-  const actions = actionUrls
-    ? [
-        {
-          type: 'Action.OpenUrl',
-          title: '✓ Approve',
-          url: actionUrls.approveUrl,
-          style: 'positive',
-        },
-        {
-          type: 'Action.OpenUrl',
-          title: '✗ Decline',
-          url: actionUrls.rejectUrl,
-          style: 'destructive',
-        },
-      ]
-    : [];
-
-  // Adaptive Card payload
-  const adaptiveCard = {
-    type: 'AdaptiveCard',
-    $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-    version: '1.4',
-    body: [
-      {
-        type: 'Container',
-        style: 'emphasis',
-        items: [
-          {
-            type: 'TextBlock',
-            text: '📅 New Time-Off Request',
-            weight: 'Bolder',
-            size: 'Large',
-            color: 'Accent',
-          },
-        ],
-      },
-      {
-        type: 'Container',
-        items: [
-          {
-            type: 'TextBlock',
-            text: `**${request.requesterName}** is requesting time off`,
-            wrap: true,
-          },
-          {
-            type: 'FactSet',
-            facts: [
-              { title: 'Type', value: request.leaveType.charAt(0).toUpperCase() + request.leaveType.slice(1) },
-              { title: 'Dates', value: `${request.startDate} to ${request.endDate}` },
-              { title: 'Duration', value: `${dayCount} ${dayWord}` },
-              ...(request.reason ? [{ title: 'Reason', value: request.reason }] : []),
-            ],
-          },
-        ],
-      },
-      ...(actionUrls
-        ? [
-            {
-              type: 'TextBlock',
-              text: '_Action links expire in 24 hours_',
-              size: 'Small',
-              isSubtle: true,
-              horizontalAlignment: 'Center',
-            },
-          ]
-        : []),
-    ],
-    actions,
-  };
-
-  // Wrap in chat message
-  const chatMessage = {
-    body: {
-      contentType: 'html',
-      content: `<attachment id="adaptiveCard"></attachment>`,
-    },
-    attachments: [
-      {
-        id: 'adaptiveCard',
-        contentType: 'application/vnd.microsoft.card.adaptive',
-        content: JSON.stringify(adaptiveCard),
-      },
-    ],
-  };
+  // Note: Full Adaptive Cards with action buttons require Teams app registration.
+  // For now, we send a text notification with the action URLs in the message.
+  // When a Teams bot is registered, we can send rich Adaptive Cards.
 
   try {
-    // First, we need to get or create a chat with the user
-    // For simplicity, we'll try to send via the chats endpoint
-    // This requires Chat.Create and ChatMessage.Send permissions
+    let teamsMessage = `${request.requesterName} has requested ${dayCount} ${dayWord} off (${request.startDate} - ${request.endDate}).`;
 
-    // Alternative: Send via Teams bot (if registered) or just use email as fallback
-    // For now, we'll log that Teams cards require additional setup
+    if (actionUrls) {
+      teamsMessage += `\n\nApprove: ${actionUrls.approveUrl}\nDecline: ${actionUrls.rejectUrl}`;
+    } else {
+      teamsMessage += ' Please review and approve or reject in the Vacation Timeline widget.';
+    }
 
-    logger?.info('Teams Adaptive Card prepared (requires Teams app registration to send)', {
-      userId,
-      requestId: request.id,
-    });
-
-    // If you have a Teams bot registered, you can send via:
-    // POST /users/{userId}/chats/{chatId}/messages
-    // But this requires a 1:1 chat to already exist
-
-    // For now, fall back to activity notification
-    const teamsMessage = `${request.requesterName} has requested ${dayCount} ${dayWord} off (${request.startDate} - ${request.endDate}). Please review and approve or reject.`;
     await sendTeamsNotification(userId, 'New Time-Off Request', teamsMessage, logger);
   } catch (error) {
-    logger?.warn('Failed to send Teams Adaptive Card (non-critical)', {
+    logger?.warn('Failed to send Teams notification (non-critical)', {
       userId,
       error: error instanceof Error ? error.message : String(error),
     });
