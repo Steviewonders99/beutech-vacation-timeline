@@ -45,6 +45,7 @@ import { LoadingState, ErrorState, EmptyState } from './components/LoadingError'
 import { RequestModal } from './components/RequestModal';
 import { MyRequests } from './components/MyRequests';
 import { ApprovalDashboard } from './components/ApprovalDashboard';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 /** Available view tabs */
 type ViewTab = 'calendar' | 'my-requests' | 'approvals';
@@ -320,11 +321,13 @@ export const VacationTimeline = ({
   // Show configuration error if API settings are missing
   if (!hasRequiredConfig) {
     return (
-      <div className={`${widgetClassName} vt-widget--error`}>
-        <ErrorState
-          message={`${t('errors.configIncomplete')}. ${t('errors.configMissing')}`}
-        />
-      </div>
+      <ErrorBoundary>
+        <div className={`${widgetClassName} vt-widget--error`}>
+          <ErrorState
+            message={`${t('errors.configIncomplete')}. ${t('errors.configMissing')}`}
+          />
+        </div>
+      </ErrorBoundary>
     );
   }
 
@@ -333,6 +336,7 @@ export const VacationTimeline = ({
   const showApprovalsTab = isSupervisor && pendingRequests.length > 0;
 
   return (
+    <ErrorBoundary>
     <div className={widgetClassName} lang={contentLanguage}>
       {/* Tabs for navigation */}
       <div className="vt-tabs" role="tablist">
@@ -510,5 +514,6 @@ export const VacationTimeline = ({
         error={requestError}
       />
     </div>
+    </ErrorBoundary>
   );
 };
