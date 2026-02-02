@@ -15,7 +15,8 @@
     "lint": "npm run lint -w apps/widget && npm run lint -w apps/backend",
     "lint:secrets": "secretlint \"**/*\"",
     "test": "npm run test -w apps/widget && npm run test -w apps/backend",
-    "clean": "rm -rf apps/*/dist apps/*/node_modules node_modules"
+    "clean": "rm -rf apps/*/dist apps/*/node_modules node_modules",
+    "validate": "./scripts/validate-deployment.sh"
   },
   "devDependencies": {
     "@secretlint/secretlint-rule-preset-recommend": "^8.0.0",
