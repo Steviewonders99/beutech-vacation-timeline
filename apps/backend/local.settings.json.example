@@ -4,7 +4,14 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "node",
 
-    "// Azure AD App Registration (required)": "",
+    "// Database (Neon PostgreSQL)": "",
+    "DATABASE_URL": "your-neon-connection-string",
+
+    "// Staffbase User API (for user/manager info)": "",
+    "STAFFBASE_API_KEY": "your-staffbase-api-key",
+    "STAFFBASE_API_URL": "https://yourcompany.staffbase.com",
+
+    "// Azure AD App Registration (required for Graph API)": "",
     "TENANT_ID": "your-azure-tenant-id",
     "CLIENT_ID": "your-app-client-id",
     "CLIENT_SECRET": "your-app-client-secret",

@@ -41,7 +41,20 @@
       "Bash(pgrep:*)",
       "Bash(gh auth status:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: Beutech Vacation Timeline Widget\n\nEnterprise-grade vacation management widget for Staffbase with:\n- Visual calendar timeline \\(day/week/month views\\)\n- Time-off request submission and approval workflow\n- Microsoft 365 Graph API integration for Outlook sync\n- Multi-language support \\(EN, DE, FR, ES\\)\n- Dark mode support\n- Azure Functions backend with PostgreSQL \\(Neon\\)\n\nReady for production deployment.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(brew install:*)",
+      "Bash(gh auth login:*)",
+      "Bash(gh repo create:*)",
+      "Bash(gh auth refresh:*)",
+      "Bash(git push:*)",
+      "Bash(gh repo list:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(neonctl projects list:*)",
+      "Bash(neonctl connection-string:*)",
+      "Bash(export PATH=\"/opt/homebrew/opt/libpq/bin:$PATH\")",
+      "Bash(psql:*)",
+      "Bash(openssl rand:*)"
     ]
   }
 }

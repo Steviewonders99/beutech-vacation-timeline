@@ -9,7 +9,11 @@ import { Defaults, LogLevel } from '../config/constants';
  * Configuration loaded from environment variables.
  */
 export interface AppConfig {
-  // Azure AD
+  // Staffbase User API (for user/manager info)
+  staffbaseApiKey?: string;
+  staffbaseApiUrl?: string;
+
+  // Azure AD (for Microsoft Graph / Calendar API)
   tenantId: string;
   clientId: string;
   clientSecret: string;
@@ -114,7 +118,11 @@ export function loadConfig(): AppConfig {
   validateCorsOrigins(allowedOrigins);
 
   return {
-    // Azure AD (required)
+    // Staffbase User API (for user/manager info)
+    staffbaseApiKey: process.env.STAFFBASE_API_KEY,
+    staffbaseApiUrl: process.env.STAFFBASE_API_URL,
+
+    // Azure AD (required for Microsoft Graph / Calendar API)
     tenantId: getRequiredEnv('TENANT_ID'),
     clientId: getRequiredEnv('CLIENT_ID'),
     clientSecret: getRequiredEnv('CLIENT_SECRET'),

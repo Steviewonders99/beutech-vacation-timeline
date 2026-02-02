@@ -14,7 +14,7 @@
     "lint:fix": "eslint --fix"
   },
   "keywords": [],
-  "author": "",
+  "author": "Beutech",
   "license": "ISC",
   "dependencies": {
     "@staffbase/widget-sdk": "3.16.2",
