@@ -11,7 +11,7 @@ import {
   HttpResponseInit,
   InvocationContext,
 } from '@azure/functions';
-import { neon } from '@neondatabase/serverless';
+import { Pool } from 'pg';
 import { getConfig, resetConfig } from '../../utils/env';
 import { getCorsHeaders } from '../../auth/apiKeyValidator';
 
@@ -86,14 +86,26 @@ async function checkDatabase(): Promise<CheckResult> {
   }
 
   const start = Date.now();
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: databaseUrl.includes('sslmode=require')
+      ? { rejectUnauthorized: false }
+      : undefined,
+    max: 1,
+    connectionTimeoutMillis: 5000,
+  });
+
   try {
-    const sql = neon(databaseUrl);
-    await sql`SELECT 1 as health_check`;
+    const client = await pool.connect();
+    await client.query('SELECT 1 as health_check');
+    client.release();
+    await pool.end();
     return {
       status: 'ok',
       latencyMs: Date.now() - start,
     };
   } catch (error) {
+    await pool.end().catch(() => {}); // Ignore cleanup errors
     return {
       status: 'error',
       latencyMs: Date.now() - start,

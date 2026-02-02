@@ -7,14 +7,12 @@
  *   DATABASE_URL=... npx ts-node scripts/migrate.ts
  *
  * This script runs all pending migrations in order.
+ * Works with both Neon and Azure PostgreSQL.
  */
 
-import { neon, neonConfig } from '@neondatabase/serverless';
+import { Pool } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
-
-// Disable connection pooling for migrations
-neonConfig.fetchConnectionCache = true;
 
 interface Migration {
   version: string;
@@ -27,35 +25,35 @@ interface AppliedMigration {
   applied_at: string;
 }
 
-async function getAppliedMigrations(sql: ReturnType<typeof neon>): Promise<Set<string>> {
+async function getAppliedMigrations(pool: Pool): Promise<Set<string>> {
+  const client = await pool.connect();
   try {
     // Check if migrations table exists
-    const tableCheck = await sql`
+    const tableCheck = await client.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables
         WHERE table_name = 'schema_migrations'
       ) as exists
-    `;
+    `);
 
-    if (!tableCheck[0]?.exists) {
+    if (!tableCheck.rows[0]?.exists) {
       console.log('Creating schema_migrations table...');
-      await sql`
+      await client.query(`
         CREATE TABLE schema_migrations (
           version VARCHAR(255) PRIMARY KEY,
           applied_at TIMESTAMPTZ DEFAULT NOW()
         )
-      `;
+      `);
       return new Set();
     }
 
-    const result = await sql<AppliedMigration[]>`
+    const result = await client.query<AppliedMigration>(`
       SELECT version, applied_at::text FROM schema_migrations ORDER BY version
-    `;
+    `);
 
-    return new Set(result.map(r => r.version));
-  } catch (error) {
-    console.error('Error checking migrations:', error);
-    return new Set();
+    return new Set(result.rows.map(r => r.version));
+  } finally {
+    client.release();
   }
 }
 
@@ -80,31 +78,26 @@ function loadMigrations(): Migration[] {
   });
 }
 
-async function runMigration(
-  sql: ReturnType<typeof neon>,
-  migration: Migration
-): Promise<void> {
+async function runMigration(pool: Pool, migration: Migration): Promise<void> {
   console.log(`Running migration: ${migration.version}`);
 
+  const client = await pool.connect();
   try {
+    await client.query('BEGIN');
+
     // Run the migration SQL
-    await sql.transaction(async (tx) => {
-      // Split by semicolons and run each statement
-      // Note: This is a simple approach. For complex migrations, consider using a proper migration tool.
-      const statements = migration.sql
-        .split(';')
-        .map(s => s.trim())
-        .filter(s => s.length > 0 && !s.startsWith('--'));
+    // Note: We run the entire SQL file as one statement to preserve transactions
+    // within the migration file itself
+    await client.query(migration.sql);
 
-      for (const statement of statements) {
-        await tx.unsafe(statement);
-      }
-    });
-
+    await client.query('COMMIT');
     console.log(`  ✓ Migration ${migration.version} completed`);
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error(`  ✗ Migration ${migration.version} failed:`, error);
     throw error;
+  } finally {
+    client.release();
   }
 }
 
@@ -113,19 +106,29 @@ async function main() {
 
   if (!databaseUrl) {
     console.error('Error: DATABASE_URL environment variable is required');
+    console.error('');
+    console.error('Usage:');
+    console.error('  DATABASE_URL=postgresql://user:pass@host/db npx ts-node scripts/migrate.ts');
     process.exit(1);
   }
 
   console.log('Connecting to database...');
-  const sql = neon(databaseUrl);
+
+  // Create connection pool with SSL for Azure PostgreSQL
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: databaseUrl.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
+  });
 
   try {
     // Test connection
-    const result = await sql`SELECT NOW() as now`;
-    console.log(`Connected at ${result[0]?.now}`);
+    const client = await pool.connect();
+    const result = await client.query('SELECT NOW() as now');
+    console.log(`Connected at ${result.rows[0]?.now}`);
+    client.release();
 
     // Get applied migrations
-    const applied = await getAppliedMigrations(sql);
+    const applied = await getAppliedMigrations(pool);
     console.log(`Found ${applied.size} applied migrations`);
 
     // Load all migrations
@@ -143,13 +146,15 @@ async function main() {
     console.log(`Running ${pending.length} pending migrations...`);
 
     for (const migration of pending) {
-      await runMigration(sql, migration);
+      await runMigration(pool, migration);
     }
 
     console.log('\nAll migrations completed successfully!');
   } catch (error) {
     console.error('\nMigration failed:', error);
     process.exit(1);
+  } finally {
+    await pool.end();
   }
 }
 

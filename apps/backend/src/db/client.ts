@@ -1,49 +1,59 @@
 /**
- * Neon PostgreSQL database client for serverless environments.
- * Uses the @neondatabase/serverless driver optimized for edge/serverless functions.
+ * PostgreSQL database client for serverless environments.
+ * Uses the pg driver which works with both Neon and Azure PostgreSQL.
  */
 
-import { neon, neonConfig } from '@neondatabase/serverless';
+import { Pool, PoolClient } from 'pg';
 import { getConfig } from '../utils/env';
 import { Logger } from '../utils/logger';
 
-// Configure Neon for Azure Functions environment
-neonConfig.fetchConnectionCache = true;
-
-// Type for the Neon SQL function
-type NeonSqlFunction = ReturnType<typeof neon>;
-
-let sqlClient: NeonSqlFunction | null = null;
+// Connection pool singleton
+let pool: Pool | null = null;
 
 /**
- * Gets or creates a Neon SQL client singleton.
- * The client is cached for connection reuse across function invocations.
+ * Gets or creates a PostgreSQL connection pool.
+ * The pool is cached for connection reuse across function invocations.
  */
-export function getDbClient(logger?: Logger): NeonSqlFunction {
-  if (!sqlClient) {
+export function getPool(logger?: Logger): Pool {
+  if (!pool) {
     const config = getConfig();
 
     if (!config.databaseUrl) {
       throw new Error('DATABASE_URL environment variable is not configured');
     }
 
-    logger?.debug('Creating new Neon database client');
-    sqlClient = neon(config.databaseUrl);
+    logger?.debug('Creating new PostgreSQL connection pool');
+
+    pool = new Pool({
+      connectionString: config.databaseUrl,
+      // Enable SSL for Azure PostgreSQL and Neon
+      ssl: config.databaseUrl.includes('sslmode=require')
+        ? { rejectUnauthorized: false }
+        : undefined,
+      // Optimize for serverless
+      max: 5, // Maximum connections in pool
+      idleTimeoutMillis: 30000, // Close idle connections after 30s
+      connectionTimeoutMillis: 10000, // Timeout after 10s if can't connect
+    });
+
+    // Handle pool errors
+    pool.on('error', (err) => {
+      logger?.error('Unexpected pool error', { error: err.message });
+    });
   }
 
-  return sqlClient;
+  return pool;
 }
 
 /**
  * Executes a parameterized SQL query with logging.
- * Uses Neon's tagged template literal syntax under the hood.
  */
 export async function query<T = unknown>(
   sql: string,
   params: unknown[] = [],
   logger?: Logger
 ): Promise<T[]> {
-  const client = getDbClient(logger);
+  const dbPool = getPool(logger);
   const startTime = Date.now();
 
   try {
@@ -52,19 +62,14 @@ export async function query<T = unknown>(
       paramCount: params.length,
     });
 
-    // Neon client expects tagged template literal, but we can call it with
-    // an array that looks like a template strings array
-    const templateStrings = [sql] as unknown as TemplateStringsArray;
-    // For parameterized queries, we use the raw SQL approach
-    // The neon function can be called with (sql, params) for parameterized queries
-    const result = await client(templateStrings, ...params);
+    const result = await dbPool.query(sql, params);
 
     logger?.debug('Query completed', {
-      rowCount: Array.isArray(result) ? result.length : 0,
+      rowCount: result.rowCount,
       durationMs: Date.now() - startTime,
     });
 
-    return (Array.isArray(result) ? result : []) as T[];
+    return result.rows as T[];
   } catch (error) {
     logger?.error('Database query failed', {
       error: error instanceof Error ? error.message : String(error),
@@ -142,6 +147,29 @@ export async function update<T = unknown>(
 }
 
 /**
+ * Executes a transaction with the provided callback.
+ */
+export async function transaction<T>(
+  callback: (client: PoolClient) => Promise<T>,
+  logger?: Logger
+): Promise<T> {
+  const dbPool = getPool(logger);
+  const client = await dbPool.connect();
+
+  try {
+    await client.query('BEGIN');
+    const result = await callback(client);
+    await client.query('COMMIT');
+    return result;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
  * Converts camelCase to snake_case.
  */
 function toSnakeCase(str: string): string {
@@ -169,4 +197,14 @@ export function toCamelCase<T>(row: Record<string, unknown>): T {
  */
 export function toCamelCaseArray<T>(rows: Record<string, unknown>[]): T[] {
   return rows.map((row) => toCamelCase<T>(row));
+}
+
+/**
+ * Closes the connection pool (useful for testing or graceful shutdown).
+ */
+export async function closePool(): Promise<void> {
+  if (pool) {
+    await pool.end();
+    pool = null;
+  }
 }
