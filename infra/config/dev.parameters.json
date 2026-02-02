@@ -13,6 +13,9 @@
     },
     "allowedOrigins": {
       "value": "*"
+    },
+    "postgresSkuTier": {
+      "value": "Burstable"
     }
   }
 }

@@ -12,7 +12,10 @@
       "value": true
     },
     "allowedOrigins": {
-      "value": "https://your-staffbase-domain.staffbase.com"
+      "value": "https://beutech.staffbase.com"
+    },
+    "postgresSkuTier": {
+      "value": "Burstable"
     }
   }
 }

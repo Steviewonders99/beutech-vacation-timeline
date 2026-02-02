@@ -385,14 +385,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           />
         ))}
 
-        {/* Today marker */}
-        {todayPosition !== null && (
-          <div
-            className="vt-timeline__today-marker"
-            style={{ left: `calc(150px + ${todayPosition}% * (100% - 150px) / 100)` }}
-            aria-hidden="true"
-          />
-        )}
+        {/* Today marker - removed, was causing visual issues */}
       </div>
     </div>
   );

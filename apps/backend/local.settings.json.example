@@ -4,8 +4,8 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "node",
 
-    "// Database (Neon PostgreSQL)": "",
-    "DATABASE_URL": "your-neon-connection-string",
+    "// Database (Azure PostgreSQL Flexible Server)": "",
+    "DATABASE_URL": "postgresql://vtadmin:{PASSWORD}@psql-vacationtimeline-{ENV}.postgres.database.azure.com/vacationtimeline?sslmode=require",
 
     "// Staffbase User API (for user/manager info)": "",
     "STAFFBASE_API_KEY": "your-staffbase-api-key",
@@ -24,6 +24,9 @@
     "// Security": "",
     "API_KEY": "your-secure-api-key-here",
     "ALLOWED_ORIGINS": "https://your-staffbase-domain.staffbase.com",
+
+    "// API Configuration (for email action links)": "",
+    "API_BASE_URL": "https://func-vacationtimeline-prod.azurewebsites.net/api",
 
     "// Optional Settings": "",
     "MAX_DATE_RANGE_DAYS": "90",

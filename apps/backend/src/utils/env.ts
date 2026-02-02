@@ -30,6 +30,9 @@ export interface AppConfig {
   apiKey: string;
   allowedOrigins: string[];
 
+  // API Configuration
+  apiBaseUrl?: string; // Base URL for action links in emails
+
   // Settings
   maxDateRangeDays: number;
   defaultTimezone: string;
@@ -140,6 +143,9 @@ export function loadConfig(): AppConfig {
     // Security
     apiKey: getRequiredEnv('API_KEY'),
     allowedOrigins,
+
+    // API Configuration (for email action links)
+    apiBaseUrl: process.env.API_BASE_URL,
 
     // Settings
     maxDateRangeDays: getIntEnv('MAX_DATE_RANGE_DAYS', Defaults.MAX_DATE_RANGE_DAYS),

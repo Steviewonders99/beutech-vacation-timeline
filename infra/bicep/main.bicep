@@ -1,6 +1,6 @@
 /**
  * Main Bicep template for Vacation Timeline infrastructure.
- * Deploys: Storage Account, Function App, App Insights, and optionally Key Vault.
+ * Deploys: Storage Account, Function App, App Insights, PostgreSQL, and optionally Key Vault.
  */
 
 @description('Environment name (dev, staging, prod)')
@@ -19,6 +19,14 @@ param deployKeyVault bool = false
 @description('Allowed CORS origins (comma-separated)')
 param allowedOrigins string = '*'
 
+@description('PostgreSQL administrator password')
+@secure()
+param postgresPassword string
+
+@description('PostgreSQL SKU tier (Burstable is cost-effective for small workloads)')
+@allowed(['Burstable', 'GeneralPurpose', 'MemoryOptimized'])
+param postgresSkuTier string = 'Burstable'
+
 // Resource naming
 var resourceSuffix = '${baseName}-${environment}'
 var storageAccountName = replace('st${baseName}${environment}', '-', '')
@@ -26,6 +34,7 @@ var functionAppName = 'func-${resourceSuffix}'
 var appServicePlanName = 'asp-${resourceSuffix}'
 var appInsightsName = 'ai-${resourceSuffix}'
 var keyVaultName = 'kv-${resourceSuffix}'
+var postgresServerName = 'psql-${resourceSuffix}'
 
 // Tags
 var tags = {
@@ -70,6 +79,18 @@ module functionApp 'functionApp.bicep' = {
   }
 }
 
+// PostgreSQL Database
+module postgresql 'postgresql.bicep' = {
+  name: 'postgresql-deployment'
+  params: {
+    serverName: postgresServerName
+    location: location
+    tags: tags
+    administratorPassword: postgresPassword
+    skuTier: postgresSkuTier
+  }
+}
+
 // Key Vault (optional)
 module keyVault 'keyVault.bicep' = if (deployKeyVault) {
   name: 'keyvault-deployment'
@@ -87,3 +108,7 @@ output functionAppUrl string = functionApp.outputs.functionAppUrl
 output storageAccountName string = storage.outputs.storageAccountName
 output appInsightsName string = appInsights.outputs.appInsightsName
 output keyVaultName string = deployKeyVault ? keyVault.outputs.keyVaultName : ''
+output postgresServerName string = postgresql.outputs.serverName
+output postgresServerFqdn string = postgresql.outputs.serverFqdn
+output postgresDatabaseName string = postgresql.outputs.databaseName
+output postgresConnectionStringTemplate string = postgresql.outputs.connectionStringTemplate

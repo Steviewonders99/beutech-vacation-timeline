@@ -142,7 +142,8 @@ export async function createRequest(
     const config = getConfig();
     const senderEmail = config.vacationCalendarMailbox || input.requesterEmail;
 
-    notifySupervisorOfNewRequest(request, senderEmail, logger).catch((err) => {
+    // Pass API base URL for actionable email buttons
+    notifySupervisorOfNewRequest(request, senderEmail, config.apiBaseUrl, logger).catch((err) => {
       logger?.warn('Failed to send supervisor notification', {
         error: err instanceof Error ? err.message : String(err),
       });
