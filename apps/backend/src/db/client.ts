@@ -6,6 +6,7 @@
 import { Pool, PoolClient } from 'pg';
 import { getConfig } from '../utils/env';
 import { Logger } from '../utils/logger';
+import { diagnoseDatabaseError, logDiagnostic, DiagnosticCode } from '../utils/diagnostics';
 
 // Connection pool singleton
 let pool: Pool | null = null;
@@ -19,10 +20,18 @@ export function getPool(logger?: Logger): Pool {
     const config = getConfig();
 
     if (!config.databaseUrl) {
+      logDiagnostic(logger, DiagnosticCode.DATABASE_URL_INVALID, {
+        reason: 'DATABASE_URL environment variable is not configured',
+      });
       throw new Error('DATABASE_URL environment variable is not configured');
     }
 
-    logger?.debug('Creating new PostgreSQL connection pool');
+    // Log connection details (without exposing password)
+    const maskedUrl = config.databaseUrl.replace(/:[^:@]+@/, ':***@');
+    logger?.debug('Creating new PostgreSQL connection pool', {
+      connectionString: maskedUrl,
+      hasSSL: config.databaseUrl.includes('sslmode=require'),
+    });
 
     pool = new Pool({
       connectionString: config.databaseUrl,
@@ -36,9 +45,17 @@ export function getPool(logger?: Logger): Pool {
       connectionTimeoutMillis: 10000, // Timeout after 10s if can't connect
     });
 
-    // Handle pool errors
+    // Handle pool errors with diagnostics
     pool.on('error', (err) => {
-      logger?.error('Unexpected pool error', { error: err.message });
+      const diagnostic = diagnoseDatabaseError(err);
+      logDiagnostic(logger, diagnostic.code, {
+        ...diagnostic.context,
+        poolEvent: 'error',
+      });
+    });
+
+    pool.on('connect', () => {
+      logger?.debug('Database pool: new connection established');
     });
   }
 
@@ -71,9 +88,11 @@ export async function query<T = unknown>(
 
     return result.rows as T[];
   } catch (error) {
-    logger?.error('Database query failed', {
-      error: error instanceof Error ? error.message : String(error),
+    const diagnostic = diagnoseDatabaseError(error);
+    logDiagnostic(logger, diagnostic.code, {
+      ...diagnostic.context,
       sql: sql.substring(0, 100),
+      paramCount: params.length,
       durationMs: Date.now() - startTime,
     });
     throw error;

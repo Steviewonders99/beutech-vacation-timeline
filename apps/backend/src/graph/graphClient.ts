@@ -8,6 +8,7 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { TokenCredentialAuthenticationProvider } from '@microsoft/microsoft-graph-client/authProviders/azureTokenCredentials';
 import { getConfig } from '../utils/env';
 import { Logger } from '../utils/logger';
+import { diagnoseGraphError, logDiagnostic, runStartupDiagnostics } from '../utils/diagnostics';
 
 /**
  * Graph client instance (singleton pattern).
@@ -19,6 +20,9 @@ let graphClientInstance: Client | null = null;
  * This is suitable for daemon/service applications that don't require user interaction.
  */
 export function getGraphClient(logger?: Logger): Client {
+  // Run startup diagnostics on first Graph client creation
+  runStartupDiagnostics(logger);
+
   if (graphClientInstance) {
     return graphClientInstance;
   }
@@ -28,6 +32,8 @@ export function getGraphClient(logger?: Logger): Client {
   logger?.debug('Initializing Graph client', {
     tenantId: config.tenantId,
     clientId: config.clientId,
+    hasClientSecret: !!config.clientSecret,
+    clientSecretLength: config.clientSecret?.length || 0,
   });
 
   // Create credential using client secret
@@ -79,9 +85,10 @@ export async function graphGet<T>(
     });
     return response as T;
   } catch (error) {
-    logger?.error('Graph GET error', {
+    const diagnostic = diagnoseGraphError(error, `GET ${endpoint}`);
+    logDiagnostic(logger, diagnostic.code, {
+      ...diagnostic.context,
       endpoint,
-      error: error instanceof Error ? error.message : String(error),
       durationMs: Date.now() - startTime,
     });
     throw error;
@@ -118,9 +125,11 @@ export async function graphGetWithParams<T>(
 
     return response as T;
   } catch (error) {
-    logger?.error('Graph GET error', {
+    const diagnostic = diagnoseGraphError(error, `GET ${endpoint} (with params)`);
+    logDiagnostic(logger, diagnostic.code, {
+      ...diagnostic.context,
       endpoint,
-      error: error instanceof Error ? error.message : String(error),
+      params,
       durationMs: Date.now() - startTime,
     });
     throw error;
@@ -147,9 +156,10 @@ export async function graphPost<T>(
     });
     return response as T;
   } catch (error) {
-    logger?.error('Graph POST error', {
+    const diagnostic = diagnoseGraphError(error, `POST ${endpoint}`);
+    logDiagnostic(logger, diagnostic.code, {
+      ...diagnostic.context,
       endpoint,
-      error: error instanceof Error ? error.message : String(error),
       durationMs: Date.now() - startTime,
     });
     throw error;
@@ -176,9 +186,10 @@ export async function graphPatch<T>(
     });
     return response as T;
   } catch (error) {
-    logger?.error('Graph PATCH error', {
+    const diagnostic = diagnoseGraphError(error, `PATCH ${endpoint}`);
+    logDiagnostic(logger, diagnostic.code, {
+      ...diagnostic.context,
       endpoint,
-      error: error instanceof Error ? error.message : String(error),
       durationMs: Date.now() - startTime,
     });
     throw error;

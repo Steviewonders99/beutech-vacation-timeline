@@ -7,6 +7,7 @@
 
 import crypto from 'crypto';
 import { getConfig } from './env';
+import { DiagnosticCode } from './diagnostics';
 
 /**
  * Action types that can be performed via token.
@@ -34,11 +35,25 @@ const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Gets the secret key for signing tokens.
- * Uses API_KEY as the base and derives a signing key from it.
+ * Uses ACTION_TOKEN_SECRET if set, otherwise derives from API_KEY.
  */
 function getSigningKey(): string {
   const config = getConfig();
-  // Derive a signing key from the API key
+  const explicitSecret = process.env.ACTION_TOKEN_SECRET;
+
+  if (explicitSecret) {
+    // Check if secret is strong enough
+    if (explicitSecret.length < 32) {
+      console.warn(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] ACTION_TOKEN_SECRET is short (${explicitSecret.length} chars). Recommend 32+ characters for security.`);
+    }
+    return crypto
+      .createHash('sha256')
+      .update(explicitSecret)
+      .digest('hex');
+  }
+
+  // Fallback: derive from API key (less secure, log warning)
+  console.warn(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] ACTION_TOKEN_SECRET not set. Deriving from API_KEY. Set ACTION_TOKEN_SECRET for better security.`);
   return crypto
     .createHash('sha256')
     .update(`action-token-${config.apiKey}`)
@@ -90,6 +105,7 @@ export function validateActionToken(token: string): ActionTokenPayload {
   // Split token into payload and signature
   const parts = token.split('.');
   if (parts.length !== 2) {
+    console.error(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] Token format invalid: expected 2 parts, got ${parts.length}`);
     throw new Error('Invalid token format');
   }
 
@@ -102,6 +118,7 @@ export function validateActionToken(token: string): ActionTokenPayload {
     .digest('base64url');
 
   if (providedSignature !== expectedSignature) {
+    console.error(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] Token signature mismatch. This can happen if ACTION_TOKEN_SECRET or API_KEY changed after the email was sent.`);
     throw new Error('Invalid token signature');
   }
 
@@ -110,21 +127,26 @@ export function validateActionToken(token: string): ActionTokenPayload {
   try {
     const payloadStr = Buffer.from(payloadB64, 'base64url').toString('utf-8');
     payload = JSON.parse(payloadStr);
-  } catch {
+  } catch (e) {
+    console.error(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] Failed to decode token payload: ${e instanceof Error ? e.message : String(e)}`);
     throw new Error('Invalid token payload');
   }
 
   // Check expiration
   if (Date.now() > payload.expiresAt) {
+    const expiredAgo = Math.round((Date.now() - payload.expiresAt) / (1000 * 60 * 60));
+    console.warn(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] Token expired ${expiredAgo} hours ago. Tokens are valid for 24 hours.`);
     throw new Error('Token has expired');
   }
 
   // Validate required fields
   if (!payload.requestId || !payload.action || !payload.supervisorEmail) {
+    console.error(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] Token payload missing required fields: requestId=${!!payload.requestId}, action=${!!payload.action}, supervisorEmail=${!!payload.supervisorEmail}`);
     throw new Error('Invalid token payload');
   }
 
   if (payload.action !== 'approve' && payload.action !== 'reject') {
+    console.error(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] Invalid action type: ${payload.action}`);
     throw new Error('Invalid action type');
   }
 

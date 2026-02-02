@@ -7,6 +7,7 @@ import { getConfig } from '../utils/env';
 import { HttpHeaders } from '../config/constants';
 import { ApiError, ErrorCodes } from '../models/ErrorResponse';
 import { Logger } from '../utils/logger';
+import { logDiagnostic, DiagnosticCode } from '../utils/diagnostics';
 
 /**
  * Validates the API key from the request headers.
@@ -20,7 +21,12 @@ export function validateApiKey(request: HttpRequest, logger?: Logger): void {
   const providedKey = request.headers.get(HttpHeaders.API_KEY);
 
   if (!providedKey) {
-    logger?.warn('API key missing from request');
+    logDiagnostic(logger, DiagnosticCode.API_KEY_MISMATCH, {
+      reason: 'API key header missing from request',
+      headerName: HttpHeaders.API_KEY,
+      url: request.url,
+      method: request.method,
+    });
     throw new ApiError(
       ErrorCodes.Unauthorized,
       'Missing API key. Include x-api-key header.',
@@ -30,7 +36,14 @@ export function validateApiKey(request: HttpRequest, logger?: Logger): void {
 
   // Constant-time comparison to prevent timing attacks
   if (!secureCompare(providedKey, config.apiKey)) {
-    logger?.warn('Invalid API key provided');
+    logDiagnostic(logger, DiagnosticCode.API_KEY_MISMATCH, {
+      reason: 'API key does not match configured value',
+      providedKeyLength: providedKey.length,
+      expectedKeyLength: config.apiKey.length,
+      providedKeyPrefix: providedKey.substring(0, 4) + '...',
+      url: request.url,
+      hint: 'Check that widget apiKey exactly matches backend API_KEY (case-sensitive)',
+    });
     throw new ApiError(
       ErrorCodes.Unauthorized,
       'Invalid API key.',
@@ -81,7 +94,13 @@ export function validateOrigin(request: HttpRequest, logger?: Logger): string | 
     return origin;
   }
 
-  logger?.warn('Origin not allowed', { origin, allowedOrigins: config.allowedOrigins });
+  // Log detailed CORS diagnostic
+  logDiagnostic(logger, DiagnosticCode.CORS_ORIGIN_MISMATCH, {
+    requestOrigin: origin,
+    allowedOrigins: config.allowedOrigins,
+    hint: 'Add the exact origin (including https://) to ALLOWED_ORIGINS environment variable',
+    checkProtocol: origin.startsWith('http://') ? 'WARNING: Request uses http://, but most Staffbase domains use https://' : undefined,
+  });
   return null;
 }
 

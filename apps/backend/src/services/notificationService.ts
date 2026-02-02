@@ -12,6 +12,7 @@ import { graphPost } from '../graph/graphClient';
 import { Logger } from '../utils/logger';
 import { TimeOffRequest } from '../models/TimeOffRequest';
 import { generateActionUrls } from '../utils/actionToken';
+import { logDiagnostic, DiagnosticCode } from '../utils/diagnostics';
 
 /**
  * Email message structure for Graph API.
@@ -328,10 +329,30 @@ export async function sendEmail(
     );
     logger?.info('Email sent successfully', { toEmail });
   } catch (error) {
-    logger?.error('Failed to send email', {
-      toEmail,
-      error: error instanceof Error ? error.message : String(error),
-    });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Log diagnostic based on error type
+    if (errorMessage.includes('403') || errorMessage.includes('Forbidden') || errorMessage.includes('Access denied')) {
+      logDiagnostic(logger, DiagnosticCode.EMAIL_SEND_FAILED, {
+        fromEmail,
+        toEmail,
+        errorMessage,
+        hint: 'App may lack Mail.Send permission or fromEmail mailbox does not exist',
+      });
+    } else if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+      logDiagnostic(logger, DiagnosticCode.EMAIL_SEND_FAILED, {
+        fromEmail,
+        toEmail,
+        errorMessage,
+        hint: `Mailbox "${fromEmail}" not found. Check NOTIFICATION_FROM_EMAIL is a valid mailbox.`,
+      });
+    } else {
+      logDiagnostic(logger, DiagnosticCode.EMAIL_SEND_FAILED, {
+        fromEmail,
+        toEmail,
+        errorMessage,
+      });
+    }
     // Don't throw - notifications are best-effort
   }
 }
