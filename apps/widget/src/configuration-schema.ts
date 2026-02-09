@@ -21,21 +21,20 @@ import { JSONSchema7 } from "json-schema";
  */
 export const configurationSchema: JSONSchema7 = {
   type: "object",
-  required: ["apiBaseUrl"],  // apiKey is optional - origin-based auth used if not provided
+  required: [],  // No required fields - production defaults are used if empty
   properties: {
     // ============================================
-    // REQUIRED SETTINGS
+    // OPTIONAL SETTINGS (defaults to Beautech production)
     // ============================================
     apiBaseUrl: {
       type: "string",
       title: "🔗 Backend URL",
-      description: "The web address where your vacation data is hosted",
-      format: "uri",
+      description: "Leave empty to use default Beautech backend",
     },
     apiKey: {
       type: "string",
       title: "🔑 Security Key",
-      description: "Secret key to securely connect to your vacation data",
+      description: "Leave empty - not needed for Staffbase (auto-authenticated)",
     },
 
     // ============================================
@@ -153,12 +152,13 @@ export const uiSchema: UiSchema = {
     "outlookCalendarUrl",
   ],
   apiBaseUrl: {
-    "ui:placeholder": "https://your-company-api.azurewebsites.net",
-    "ui:help": "Provided by your IT team during setup",
+    "ui:placeholder": "(Leave empty for Beautech default)",
+    "ui:help": "Optional - uses Beautech production backend if empty",
   },
   apiKey: {
     "ui:widget": "password",
-    "ui:help": "Provided by your IT team - keep this private!",
+    "ui:placeholder": "(Not needed for Staffbase)",
+    "ui:help": "Optional - Staffbase requests are auto-authenticated",
   },
   darkMode: {
     "ui:widget": "checkbox",
