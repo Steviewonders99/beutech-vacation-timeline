@@ -37,8 +37,8 @@ import type {
 export interface ApiClientConfig {
   /** Base URL of the Azure Functions backend */
   baseUrl: string;
-  /** API key for authentication */
-  apiKey: string;
+  /** API key for authentication (optional - origin-based auth used if not provided) */
+  apiKey?: string;
   /** Request timeout in milliseconds */
   timeout?: number;
 }
@@ -66,6 +66,8 @@ export function createApiClient(config: ApiClientConfig) {
 
   /**
    * Makes an authenticated request to the API.
+   * If apiKey is provided, it's sent in the header.
+   * Otherwise, relies on origin-based authentication (CORS).
    */
   async function request<T>(
     endpoint: string,
@@ -76,14 +78,19 @@ export function createApiClient(config: ApiClientConfig) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+    // Build headers - only include API key if provided
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string>),
+    };
+    if (apiKey) {
+      headers['x-api-key'] = apiKey;
+    }
+
     try {
       const response = await fetch(url, {
         ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          ...options.headers,
-        },
+        headers,
         signal: controller.signal,
       });
 

@@ -21,7 +21,7 @@ import { JSONSchema7 } from "json-schema";
  */
 export const configurationSchema: JSONSchema7 = {
   type: "object",
-  required: ["apiBaseUrl", "apiKey"],
+  required: ["apiBaseUrl"],  // apiKey is optional - origin-based auth used if not provided
   properties: {
     // ============================================
     // REQUIRED SETTINGS

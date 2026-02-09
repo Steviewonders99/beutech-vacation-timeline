@@ -53,9 +53,28 @@ export interface WidgetConfiguration extends BlockAttributes {
 }
 
 /**
+ * Production configuration for Beautech deployment.
+ * These values are used when Staffbase Studio config is not available.
+ *
+ * SECURITY: No API key needed - backend authenticates via trusted origin (CORS).
+ * Requests from team.beautech.aero are automatically trusted.
+ */
+export const PRODUCTION_CONFIG = {
+  apiBaseUrl: 'https://vacation-timeline-fgcmcrc0c5ezfuf5.centralus-01.azurewebsites.net',
+  // API key not needed - origin-based auth is used
+  sharedCalendarMailbox: 'vacations@beautech.aero',
+  m365FallbackDomain: 'beautech.aero',
+};
+
+/**
  * Default configuration values.
  */
 export const DEFAULT_CONFIG: Partial<WidgetConfiguration> = {
+  // Use production values as defaults
+  apiBaseUrl: PRODUCTION_CONFIG.apiBaseUrl,
+  sharedCalendarMailbox: PRODUCTION_CONFIG.sharedCalendarMailbox,
+  m365FallbackDomain: PRODUCTION_CONFIG.m365FallbackDomain,
+  // Other defaults
   calendarMode: 'shared',
   defaultView: 'week',
   darkMode: false,

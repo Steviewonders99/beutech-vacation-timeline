@@ -22,7 +22,7 @@ import { useLanguage } from './hooks/useLanguage';
 import type { VacationView, TimelineUser } from './types/vacation';
 import type { WidgetConfiguration } from './types/config';
 import type { LeaveType } from './types/request';
-import { DEFAULT_CONFIG } from './types/config';
+import { DEFAULT_CONFIG, PRODUCTION_CONFIG } from './types/config';
 
 // Hooks
 import { useViewRange } from './hooks/useViewRange';
@@ -66,16 +66,16 @@ export interface VacationTimelineProps extends BlockAttributes, Partial<WidgetCo
  * Displays a multi-user vacation timeline with filtering and navigation.
  */
 export const VacationTimeline = ({
-  // Widget configuration (from Staffbase Studio)
-  apiBaseUrl = '',
-  apiKey = '',
+  // Widget configuration (from Staffbase Studio - with production fallbacks)
+  apiBaseUrl: propsApiBaseUrl = '',
+  apiKey: propsApiKey = '',
   calendarMode = DEFAULT_CONFIG.calendarMode!,
-  sharedCalendarMailbox,
+  sharedCalendarMailbox: propsSharedCalendarMailbox,
   defaultView = DEFAULT_CONFIG.defaultView!,
   darkMode = DEFAULT_CONFIG.darkMode!,
   vacationCategory = DEFAULT_CONFIG.vacationCategory!,
   maxUsers = DEFAULT_CONFIG.maxUsers!,
-  m365FallbackDomain,
+  m365FallbackDomain: propsM365FallbackDomain,
   // SAML deep link settings
   enableOutlookDeepLink = DEFAULT_CONFIG.enableOutlookDeepLink!,
   staffbaseHost,
@@ -86,15 +86,22 @@ export const VacationTimeline = ({
   widgetApi = null,
   contentLanguage,
 }: VacationTimelineProps): ReactElement => {
-  // DEBUG: Log received configuration
+  // Use production config as fallback when Staffbase config is empty
+  const apiBaseUrl = propsApiBaseUrl || PRODUCTION_CONFIG.apiBaseUrl;
+  const apiKey = propsApiKey; // Optional - origin-based auth used if not provided
+  const sharedCalendarMailbox = propsSharedCalendarMailbox || PRODUCTION_CONFIG.sharedCalendarMailbox;
+  const m365FallbackDomain = propsM365FallbackDomain || PRODUCTION_CONFIG.m365FallbackDomain;
+
+  // DEBUG: Log configuration source
   useEffect(() => {
-    console.log('[VacationTimeline] Configuration received:', {
-      apiBaseUrl: apiBaseUrl || '(empty)',
-      apiKey: apiKey ? 'SET (' + apiKey.length + ' chars)' : '(empty)',
+    console.log('[VacationTimeline] Configuration:', {
+      apiBaseUrl,
+      authMethod: apiKey ? 'API Key' : 'Origin-based (secure)',
+      source: propsApiBaseUrl ? 'Staffbase Studio' : 'Production defaults',
       calendarMode,
       sharedCalendarMailbox,
     });
-  }, [apiBaseUrl, apiKey, calendarMode, sharedCalendarMailbox]);
+  }, [apiBaseUrl, apiKey, propsApiBaseUrl, calendarMode, sharedCalendarMailbox]);
   // Initialize i18n with Staffbase language
   const { t } = useLanguage(contentLanguage);
 
@@ -141,7 +148,8 @@ export const VacationTimeline = ({
 
   // Check if we have required configuration (or should use mock data in development)
   const useMockData = shouldUseMockData(apiBaseUrl);
-  const hasRequiredConfig = (apiBaseUrl && apiKey) || useMockData;
+  // API key is optional - origin-based auth is used when running in Staffbase
+  const hasRequiredConfig = apiBaseUrl || useMockData;
 
   // Time-off request hook
   const {

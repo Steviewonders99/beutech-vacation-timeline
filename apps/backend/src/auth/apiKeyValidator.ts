@@ -10,22 +10,56 @@ import { Logger } from '../utils/logger';
 import { logDiagnostic, DiagnosticCode } from '../utils/diagnostics';
 
 /**
+ * Trusted origins that can access the API without an API key.
+ * These are validated via CORS (browsers enforce Origin header).
+ */
+const TRUSTED_ORIGINS = [
+  'https://team.beautech.aero',
+  'https://beautech.staffbase.com',
+];
+
+/**
+ * Checks if the request origin is trusted (for keyless auth).
+ */
+function isTrustedOrigin(request: HttpRequest): boolean {
+  const origin = request.headers.get('Origin');
+  if (!origin) return false;
+  return TRUSTED_ORIGINS.some(trusted =>
+    origin.toLowerCase() === trusted.toLowerCase()
+  );
+}
+
+/**
  * Validates the API key from the request headers.
+ *
+ * Security model:
+ * - Requests from TRUSTED_ORIGINS (Staffbase) don't need an API key
+ * - Other requests require a valid API key
+ * - CORS prevents unauthorized browser requests
  *
  * @param request - The HTTP request
  * @param logger - Optional logger instance
- * @throws ApiError if the API key is missing or invalid
+ * @throws ApiError if authentication fails
  */
 export function validateApiKey(request: HttpRequest, logger?: Logger): void {
   const config = getConfig();
   const providedKey = request.headers.get(HttpHeaders.API_KEY);
+  const origin = request.headers.get('Origin');
 
+  // Allow requests from trusted origins without API key (CORS-secured)
+  if (isTrustedOrigin(request)) {
+    logger?.debug('Request authenticated via trusted origin', { origin });
+    return;
+  }
+
+  // For non-trusted origins, require API key
   if (!providedKey) {
     logDiagnostic(logger, DiagnosticCode.API_KEY_MISMATCH, {
       reason: 'API key header missing from request',
       headerName: HttpHeaders.API_KEY,
       url: request.url,
       method: request.method,
+      origin: origin || '(no origin)',
     });
     throw new ApiError(
       ErrorCodes.Unauthorized,
