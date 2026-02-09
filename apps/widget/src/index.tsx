@@ -60,6 +60,9 @@ const factory: BlockFactory = (BaseBlockClass, widgetApi: WidgetApi) => {
 
     private get props(): VacationTimelineProps {
       const attrs = this.parseAttributes<VacationTimelineProps>();
+      // DEBUG: Log raw attributes and parsed values
+      console.log('[Widget] Raw HTML attributes:', Array.from(this.attributes).map(a => `${a.name}="${a.value}"`));
+      console.log('[Widget] Parsed attributes:', attrs);
       return {
         ...attrs,
         contentLanguage: this.contentLanguage,

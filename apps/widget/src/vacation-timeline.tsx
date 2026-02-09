@@ -86,6 +86,15 @@ export const VacationTimeline = ({
   widgetApi = null,
   contentLanguage,
 }: VacationTimelineProps): ReactElement => {
+  // DEBUG: Log received configuration
+  useEffect(() => {
+    console.log('[VacationTimeline] Configuration received:', {
+      apiBaseUrl: apiBaseUrl || '(empty)',
+      apiKey: apiKey ? 'SET (' + apiKey.length + ' chars)' : '(empty)',
+      calendarMode,
+      sharedCalendarMailbox,
+    });
+  }, [apiBaseUrl, apiKey, calendarMode, sharedCalendarMailbox]);
   // Initialize i18n with Staffbase language
   const { t } = useLanguage(contentLanguage);
 
