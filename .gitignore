@@ -41,3 +41,6 @@ obj/
 tmp/
 temp/
 *.tmp
+
+# Claude Code settings (may contain local paths)
+.claude/

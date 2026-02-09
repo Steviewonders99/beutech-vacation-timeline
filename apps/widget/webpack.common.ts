@@ -15,7 +15,7 @@ import * as webpack from "webpack";
 
 const config: webpack.Configuration = {
   entry: {
-    "beutech.vacation-timeline": "./src/index.tsx",
+    "beautech.vacation-timeline": "./src/index.tsx",
   },
   module: {
     rules: [
