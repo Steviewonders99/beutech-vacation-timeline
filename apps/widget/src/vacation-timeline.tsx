@@ -105,13 +105,12 @@ export const VacationTimeline = ({
   // Initialize i18n with Staffbase language
   const { t } = useLanguage(contentLanguage);
 
-  // Get current Staffbase user context (includes manager and supervisor info)
+  // Get current Staffbase user context (includes manager info)
   const {
     user: staffbaseUser,
     m365Upn,
     isLoading: userLoading,
     managerEmail,
-    isSupervisor,
   } = useStaffbaseUserContext(widgetApi, m365FallbackDomain);
 
   // View range state (view type + current date)
@@ -184,7 +183,7 @@ export const VacationTimeline = ({
     skip: !hasRequiredConfig || !m365Upn,
   });
 
-  // Pending approvals hook (only for supervisors with direct reports)
+  // Pending approvals hook - always try to fetch, backend determines if user is supervisor
   const {
     pendingRequests,
     isLoading: approvalsLoading,
@@ -196,8 +195,8 @@ export const VacationTimeline = ({
   } = usePendingApprovals({
     apiConfig,
     supervisorEmail: m365Upn,
-    // Skip if not configured, no email, or user is not a supervisor
-    skip: !hasRequiredConfig || !m365Upn || !isSupervisor,
+    // Skip only if not configured or no email - backend determines supervisor status
+    skip: !hasRequiredConfig || !m365Upn,
   });
 
   // Fetch the first future event date to initialize the view
@@ -348,9 +347,9 @@ export const VacationTimeline = ({
     );
   }
 
-  // Check if user should see the Approvals tab (is a supervisor with pending requests)
-  // The Approvals tab is only shown if user is a supervisor (has direct reports)
-  const showApprovalsTab = isSupervisor && pendingRequests.length > 0;
+  // Check if user should see the Approvals tab
+  // Show if user has any pending requests to approve (backend determines supervisor status)
+  const showApprovalsTab = pendingRequests.length > 0;
 
   return (
     <ErrorBoundary>
