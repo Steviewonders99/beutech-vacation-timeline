@@ -452,6 +452,128 @@ export async function approveRequest(
 }
 
 /**
+ * Cancels a time-off request (by the requester).
+ *
+ * @param requestId - UUID of the request to cancel
+ * @param requesterEmail - Email of the requester (must match)
+ * @param logger - Optional logger instance
+ * @returns The cancelled request
+ */
+export async function cancelRequest(
+  requestId: string,
+  requesterEmail: string,
+  logger?: Logger
+): Promise<TimeOffRequest> {
+  logger?.startOperation('cancelRequest', { requestId, requesterEmail });
+  const startTime = Date.now();
+
+  try {
+    // Get the request
+    const request = await getRequestById(requestId, logger);
+
+    if (!request) {
+      throw new ApiError(
+        ErrorCodes.NotFound,
+        `Time-off request ${requestId} not found`,
+        404
+      );
+    }
+
+    // Verify it's still pending
+    if (request.status !== 'pending') {
+      throw new ApiError(
+        ErrorCodes.BadRequest,
+        `Cannot cancel a request that is already ${request.status}`,
+        400
+      );
+    }
+
+    // Verify requester owns this request
+    if (request.requesterEmail.toLowerCase() !== requesterEmail.toLowerCase()) {
+      throw new ApiError(
+        ErrorCodes.Forbidden,
+        'You can only cancel your own requests',
+        403
+      );
+    }
+
+    // Update request status to cancelled
+    const updateSql = `
+      UPDATE time_off_requests
+      SET status = 'cancelled',
+          status_changed_at = NOW(),
+          status_changed_by = $2,
+          updated_at = NOW()
+      WHERE id = $1
+      RETURNING *
+    `;
+
+    const rows = await query<TimeOffRequestRow>(
+      updateSql,
+      [requestId, requesterEmail],
+      logger
+    );
+
+    if (rows.length === 0) {
+      throw new Error('Update did not return a row');
+    }
+
+    const updatedRequest = toTimeOffRequest(rows[0]);
+
+    logger?.endOperation('cancelRequest', startTime, { requestId });
+
+    return updatedRequest;
+  } catch (error) {
+    logger?.error('Failed to cancel request', {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+      durationMs: Date.now() - startTime,
+    });
+
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    throw new ApiError(
+      ErrorCodes.InternalError,
+      `Failed to cancel request: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      500
+    );
+  }
+}
+
+/**
+ * Checks if a user is a supervisor (has any requests where they are the supervisor).
+ *
+ * @param email - User's email address
+ * @param logger - Optional logger instance
+ * @returns True if user is a supervisor
+ */
+export async function checkIsSupervisor(
+  email: string,
+  logger?: Logger
+): Promise<boolean> {
+  try {
+    const sql = `
+      SELECT EXISTS(
+        SELECT 1 FROM time_off_requests
+        WHERE supervisor_email = $1
+        LIMIT 1
+      ) as is_supervisor
+    `;
+
+    const rows = await query<{ is_supervisor: boolean }>(sql, [email], logger);
+    return rows[0]?.is_supervisor || false;
+  } catch (error) {
+    logger?.error('Failed to check supervisor status', {
+      email,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return false;
+  }
+}
+
+/**
  * Rejects a time-off request.
  *
  * @param requestId - UUID of the request to reject

@@ -107,6 +107,7 @@ function secureCompare(a: string, b: string): boolean {
 /**
  * Validates CORS origin.
  * Returns the allowed origin header value or null if not allowed.
+ * Allows both TRUSTED_ORIGINS and config.allowedOrigins.
  */
 export function validateOrigin(request: HttpRequest, logger?: Logger): string | null {
   const config = getConfig();
@@ -117,21 +118,27 @@ export function validateOrigin(request: HttpRequest, logger?: Logger): string | 
     return null;
   }
 
-  // Check if origin is allowed
+  // First check trusted origins (hardcoded for security)
+  if (isTrustedOrigin(request)) {
+    logger?.debug('Origin validated via trusted origins', { origin });
+    return origin;
+  }
+
+  // Then check configured allowed origins
   const isAllowed = config.allowedOrigins.some((allowed) => {
     if (allowed === '*') return true;
     return origin.toLowerCase() === allowed.toLowerCase();
   });
 
   if (isAllowed) {
-    logger?.debug('Origin validated', { origin });
+    logger?.debug('Origin validated via config', { origin });
     return origin;
   }
 
   // Log detailed CORS diagnostic
   logDiagnostic(logger, DiagnosticCode.CORS_ORIGIN_MISMATCH, {
     requestOrigin: origin,
-    allowedOrigins: config.allowedOrigins,
+    allowedOrigins: [...TRUSTED_ORIGINS, ...config.allowedOrigins],
     hint: 'Add the exact origin (including https://) to ALLOWED_ORIGINS environment variable',
     checkProtocol: origin.startsWith('http://') ? 'WARNING: Request uses http://, but most Staffbase domains use https://' : undefined,
   });

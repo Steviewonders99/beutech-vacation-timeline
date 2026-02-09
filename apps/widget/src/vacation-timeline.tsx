@@ -32,6 +32,7 @@ import { useNextEventDate } from './hooks/useNextEventDate';
 import { useTimeOffRequest } from './hooks/useTimeOffRequest';
 import { useMyRequests } from './hooks/useMyRequests';
 import { usePendingApprovals } from './hooks/usePendingApprovals';
+import { useSupervisorStatus } from './hooks/useSupervisorStatus';
 
 // Utils
 import { buildOutlookDeepLink } from './utils/deepLinkUtils';
@@ -177,13 +178,22 @@ export const VacationTimeline = ({
     isLoading: myRequestsLoading,
     error: myRequestsError,
     refresh: refreshMyRequests,
+    cancelRequest,
+    isCancelling,
   } = useMyRequests({
     apiConfig,
     userEmail: m365Upn,
     skip: !hasRequiredConfig || !m365Upn,
   });
 
-  // Pending approvals hook - always try to fetch, backend determines if user is supervisor
+  // Check if user is a supervisor (has direct reports in the system)
+  const { isSupervisor } = useSupervisorStatus({
+    apiConfig,
+    email: m365Upn,
+    skip: !hasRequiredConfig || !m365Upn,
+  });
+
+  // Pending approvals hook - only fetch if user is a supervisor
   const {
     pendingRequests,
     isLoading: approvalsLoading,
@@ -195,8 +205,8 @@ export const VacationTimeline = ({
   } = usePendingApprovals({
     apiConfig,
     supervisorEmail: m365Upn,
-    // Skip only if not configured or no email - backend determines supervisor status
-    skip: !hasRequiredConfig || !m365Upn,
+    // Skip if not configured, no email, or user is not a supervisor
+    skip: !hasRequiredConfig || !m365Upn || !isSupervisor,
   });
 
   // Fetch the first future event date to initialize the view
@@ -348,8 +358,8 @@ export const VacationTimeline = ({
   }
 
   // Check if user should see the Approvals tab
-  // Show if user has any pending requests to approve (backend determines supervisor status)
-  const showApprovalsTab = pendingRequests.length > 0;
+  // Show if user is a supervisor (has direct reports in the system)
+  const showApprovalsTab = isSupervisor;
 
   return (
     <ErrorBoundary>
@@ -500,6 +510,8 @@ export const VacationTimeline = ({
             isLoading={myRequestsLoading}
             error={myRequestsError}
             onRefresh={refreshMyRequests}
+            onCancel={cancelRequest}
+            isCancelling={isCancelling}
           />
         </div>
       )}

@@ -229,6 +229,28 @@ export function createApiClient(config: ApiClientConfig) {
     });
   }
 
+  /**
+   * Cancels a time-off request (by the requester).
+   */
+  async function cancelTimeOffRequest(
+    requestId: string,
+    requesterEmail: string
+  ): Promise<{ request: { id: string; status: string }; message: string }> {
+    return request(`/api/requests/${requestId}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify({ requesterEmail }),
+    });
+  }
+
+  /**
+   * Checks if a user is a supervisor (has direct reports with requests).
+   */
+  async function checkIsSupervisor(
+    email: string
+  ): Promise<{ isSupervisor: boolean; email: string }> {
+    return request(`/api/users/is-supervisor?email=${encodeURIComponent(email)}`);
+  }
+
   return {
     fetchVacations,
     fetchNextEventDate,
@@ -236,6 +258,8 @@ export function createApiClient(config: ApiClientConfig) {
     listTimeOffRequests,
     approveTimeOffRequest,
     rejectTimeOffRequest,
+    cancelTimeOffRequest,
+    checkIsSupervisor,
     request,
   };
 }

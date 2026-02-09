@@ -40,6 +40,10 @@ export interface UseMyRequestsReturn {
   error: string | null;
   /** Refresh the requests */
   refresh: () => void;
+  /** Cancel a pending request */
+  cancelRequest: (requestId: string) => Promise<void>;
+  /** Whether a cancel action is in progress */
+  isCancelling: boolean;
 }
 
 /**
@@ -61,6 +65,7 @@ export function useMyRequests(options: UseMyRequestsOptions): UseMyRequestsRetur
 
   const [requests, setRequests] = useState<TimeOffRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const requestIdRef = useRef(0);
@@ -134,10 +139,57 @@ export function useMyRequests(options: UseMyRequestsOptions): UseMyRequestsRetur
     fetchRequests();
   }, [fetchRequests]);
 
+  const cancelRequest = useCallback(
+    async (requestId: string): Promise<void> => {
+      if (!userEmail) {
+        throw new Error('User email is required');
+      }
+
+      setIsCancelling(true);
+      setError(null);
+
+      try {
+        // Use mock behavior in development
+        if (useMockData) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          // Update local state to show cancelled
+          setRequests((prev) =>
+            prev.map((r) =>
+              r.id === requestId ? { ...r, status: 'cancelled' as const } : r
+            )
+          );
+          return;
+        }
+
+        await apiClient.cancelTimeOffRequest(requestId, userEmail);
+        // Update local state to show cancelled
+        setRequests((prev) =>
+          prev.map((r) =>
+            r.id === requestId ? { ...r, status: 'cancelled' as const } : r
+          )
+        );
+      } catch (err) {
+        const errorMessage =
+          err instanceof ApiError
+            ? err.message
+            : err instanceof Error
+              ? err.message
+              : 'Failed to cancel request';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsCancelling(false);
+      }
+    },
+    [apiClient, userEmail, useMockData]
+  );
+
   return {
     requests,
     isLoading,
     error,
     refresh: fetchRequests,
+    cancelRequest,
+    isCancelling,
   };
 }

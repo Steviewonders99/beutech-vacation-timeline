@@ -24,6 +24,10 @@ export interface MyRequestsProps {
   error: string | null;
   /** Refresh the requests */
   onRefresh: () => void;
+  /** Cancel a pending request */
+  onCancel?: (requestId: string) => Promise<void>;
+  /** Whether a cancel action is in progress */
+  isCancelling?: boolean;
 }
 
 /**
@@ -83,12 +87,29 @@ function calculateDays(startDate: string, endDate: string): number {
   return diffDays + 1; // Inclusive of both dates
 }
 
+interface RequestCardProps {
+  request: TimeOffRequest;
+  onCancel?: (requestId: string) => Promise<void>;
+  isCancelling?: boolean;
+}
+
 /**
  * Component to display a single request card.
  */
-const RequestCard: React.FC<{ request: TimeOffRequest }> = ({ request }) => {
+const RequestCard: React.FC<RequestCardProps> = ({ request, onCancel, isCancelling }) => {
   const days = calculateDays(request.startDate, request.endDate);
   const daysLabel = days === 1 ? '1 day' : `${days} days`;
+  const canCancel = request.status === 'pending' && onCancel;
+
+  const handleCancel = async () => {
+    if (onCancel && window.confirm('Are you sure you want to cancel this request?')) {
+      try {
+        await onCancel(request.id);
+      } catch {
+        // Error is handled by the hook
+      }
+    }
+  };
 
   return (
     <div className="vt-request-card">
@@ -134,12 +155,24 @@ const RequestCard: React.FC<{ request: TimeOffRequest }> = ({ request }) => {
         </div>
       )}
       <div className="vt-request-card__footer">
-        <span className="vt-request-card__supervisor">
-          Supervisor: {request.supervisorName || request.supervisorEmail}
-        </span>
-        <span className="vt-request-card__submitted">
-          Submitted {formatDate(request.createdAt)}
-        </span>
+        <div className="vt-request-card__info">
+          <span className="vt-request-card__supervisor">
+            Supervisor: {request.supervisorName || request.supervisorEmail}
+          </span>
+          <span className="vt-request-card__submitted">
+            Submitted {formatDate(request.createdAt)}
+          </span>
+        </div>
+        {canCancel && (
+          <button
+            type="button"
+            className="vt-btn vt-btn--danger vt-btn--small"
+            onClick={handleCancel}
+            disabled={isCancelling}
+          >
+            {isCancelling ? 'Cancelling...' : 'Cancel Request'}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -153,6 +186,8 @@ export const MyRequests: React.FC<MyRequestsProps> = ({
   isLoading,
   error,
   onRefresh,
+  onCancel,
+  isCancelling,
 }) => {
   if (isLoading) {
     return (
@@ -237,7 +272,12 @@ export const MyRequests: React.FC<MyRequestsProps> = ({
       </div>
       <div className="vt-my-requests__list">
         {sortedRequests.map((request) => (
-          <RequestCard key={request.id} request={request} />
+          <RequestCard
+            key={request.id}
+            request={request}
+            onCancel={onCancel}
+            isCancelling={isCancelling}
+          />
         ))}
       </div>
     </div>
