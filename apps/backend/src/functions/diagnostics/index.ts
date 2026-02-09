@@ -187,7 +187,7 @@ async function checkGraphApi(): Promise<DiagnosticResult> {
     );
 
     if (!tokenResponse.ok) {
-      const error = await tokenResponse.json().catch(() => ({}));
+      const error = await tokenResponse.json().catch(() => ({})) as { error?: string; error_description?: string };
       return {
         status: 'error',
         message: `Failed to acquire Graph API token: ${error.error_description || tokenResponse.statusText}`,
@@ -201,7 +201,7 @@ async function checkGraphApi(): Promise<DiagnosticResult> {
     }
 
     // Token acquired successfully - try a simple Graph call
-    const tokenData = await tokenResponse.json();
+    const tokenData = await tokenResponse.json() as { access_token: string };
     const graphResponse = await fetch(
       'https://graph.microsoft.com/v1.0/organization',
       {
