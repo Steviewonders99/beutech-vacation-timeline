@@ -16,8 +16,8 @@ describe('Widget registration', () => {
 
     expect(configurationSchema).toBeDefined();
     expect(configurationSchema.type).toBe('object');
-    expect(configurationSchema.required).toContain('apiBaseUrl');
-    expect(configurationSchema.required).toContain('apiKey');
+    // No required fields - production defaults are used if config is empty
+    expect(configurationSchema.required).toEqual([]);
 
     expect(uiSchema).toBeDefined();
     expect(uiSchema.apiKey).toBeDefined();

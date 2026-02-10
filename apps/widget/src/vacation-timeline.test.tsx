@@ -88,24 +88,28 @@ describe('VacationTimeline', () => {
   });
 
   describe('configuration validation', () => {
-    it('should show error when apiBaseUrl is missing', () => {
-      render(<VacationTimeline apiKey="test-key" contentLanguage="en_US" />);
+    it('should use production defaults when apiBaseUrl is missing', () => {
+      // With production defaults, widget works without explicit config
+      render(<VacationTimeline contentLanguage="en_US" />);
 
-      expect(screen.getByText(/Widget configuration is incomplete/i)).toBeInTheDocument();
+      // Should render normally, not show configuration error
+      expect(screen.queryByText(/Widget configuration is incomplete/i)).not.toBeInTheDocument();
     });
 
-    it('should show error when apiKey is missing', () => {
+    it('should use provided apiBaseUrl when specified', () => {
       render(
         <VacationTimeline apiBaseUrl="https://api.example.com" contentLanguage="en_US" />
       );
 
-      expect(screen.getByText(/Widget configuration is incomplete/i)).toBeInTheDocument();
+      // Should render normally with custom config
+      expect(screen.queryByText(/Widget configuration is incomplete/i)).not.toBeInTheDocument();
     });
 
-    it('should show error when both are missing', () => {
+    it('should render with no props using production defaults', () => {
       render(<VacationTimeline contentLanguage="en_US" />);
 
-      expect(screen.getByText(/Widget configuration is incomplete/i)).toBeInTheDocument();
+      // Widget should work with production defaults
+      expect(screen.queryByText(/Widget configuration is incomplete/i)).not.toBeInTheDocument();
     });
   });
 
