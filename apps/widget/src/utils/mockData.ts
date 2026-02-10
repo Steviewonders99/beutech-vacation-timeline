@@ -368,7 +368,7 @@ export interface MockOrgData {
  * Get mock organization data for development.
  * In dev mode, simulate that the user is a supervisor with a manager.
  */
-export function getMockOrgData(userEmail: string): MockOrgData {
+export function getMockOrgData(_userEmail: string): MockOrgData {
   return {
     manager: {
       id: 'manager-001',

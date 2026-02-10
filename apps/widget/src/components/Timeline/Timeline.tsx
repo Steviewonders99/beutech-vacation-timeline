@@ -127,7 +127,7 @@ export const Timeline: React.FC<TimelineProps> = ({
   }, [events, users]);
 
   // Calculate the "today" marker position
-  const todayPosition = useMemo(() => {
+  const _todayPosition = useMemo(() => {
     const today = new Date();
     if (today < startDate || today > endDate) {
       return null;

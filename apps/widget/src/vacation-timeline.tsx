@@ -74,7 +74,7 @@ export const VacationTimeline = ({
   sharedCalendarMailbox: propsSharedCalendarMailbox,
   defaultView = DEFAULT_CONFIG.defaultView!,
   darkMode = DEFAULT_CONFIG.darkMode!,
-  vacationCategory = DEFAULT_CONFIG.vacationCategory!,
+  vacationCategory: _vacationCategory = DEFAULT_CONFIG.vacationCategory!,
   maxUsers = DEFAULT_CONFIG.maxUsers!,
   m365FallbackDomain: propsM365FallbackDomain,
   // SAML deep link settings
@@ -111,7 +111,7 @@ export const VacationTimeline = ({
     user: staffbaseUser,
     m365Upn,
     isLoading: userLoading,
-    managerEmail,
+    managerEmail: _managerEmail,
   } = useStaffbaseUserContext(widgetApi, m365FallbackDomain);
 
   // View range state (view type + current date)
