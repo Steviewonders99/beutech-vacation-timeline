@@ -126,8 +126,9 @@ export const Timeline: React.FC<TimelineProps> = ({
     return map;
   }, [events, users]);
 
-  // Calculate the "today" marker position
-  const _todayPosition = useMemo(() => {
+  // NOTE: todayPosition is calculated but not rendered yet - will be used for "today" marker
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const todayPosition = useMemo(() => {
     const today = new Date();
     if (today < startDate || today > endDate) {
       return null;

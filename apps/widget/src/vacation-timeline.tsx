@@ -111,7 +111,6 @@ export const VacationTimeline = ({
     user: staffbaseUser,
     m365Upn,
     isLoading: userLoading,
-    managerEmail: _managerEmail,
   } = useStaffbaseUserContext(widgetApi, m365FallbackDomain);
 
   // View range state (view type + current date)
