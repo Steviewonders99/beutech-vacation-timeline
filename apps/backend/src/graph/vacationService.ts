@@ -80,12 +80,40 @@ async function getVacationsFromSharedCalendar(
     );
 
     // Transform to VacationEvent format
-    // For shared calendar, we need to extract user info from organizer or attendees
+    // For shared calendar, extract user info from the event subject
+    // Subject format: "Name - Vacation", "Name - PTO", "Name - Time Off", etc.
     const events = response.value.map((event) => {
-      const organizerEmail = event.organizer?.emailAddress?.address || 'unknown';
-      const organizerName = event.organizer?.emailAddress?.name || 'Unknown';
+      let userName = 'Unknown';
+      let userEmail = event.organizer?.emailAddress?.address || 'unknown';
 
-      return toVacationEvent(event, organizerEmail, organizerName);
+      // Parse the subject to extract the person's name
+      // Common patterns: "Name - Vacation", "Name - PTO", "Name - Time Off"
+      if (event.subject) {
+        const subjectMatch = event.subject.match(/^(.+?)\s*[-–—]\s*/);
+        if (subjectMatch && subjectMatch[1]) {
+          userName = subjectMatch[1].trim();
+        } else {
+          // If no dash separator, use the whole subject as the name
+          userName = event.subject.trim();
+        }
+      }
+
+      // Try to find the actual user email from attendees
+      // The first attendee (not the organizer) is likely the person taking vacation
+      if (event.attendees && event.attendees.length > 0) {
+        const attendee = event.attendees.find(
+          (a) => a.emailAddress?.address?.toLowerCase() !== config.vacationCalendarMailbox?.toLowerCase()
+        );
+        if (attendee?.emailAddress?.address) {
+          userEmail = attendee.emailAddress.address;
+          // If we didn't get a name from subject, use attendee name
+          if (userName === 'Unknown' && attendee.emailAddress.name) {
+            userName = attendee.emailAddress.name;
+          }
+        }
+      }
+
+      return toVacationEvent(event, userEmail, userName);
     });
 
     logger?.info('Retrieved vacations from shared calendar', {
