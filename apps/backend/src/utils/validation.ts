@@ -281,6 +281,7 @@ export function sanitizeForLogging(value: string | null | undefined): string {
 
   // Remove control characters and limit length for logging
   return value
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x1F\x7F]/g, '')
     .substring(0, 500);
 }
