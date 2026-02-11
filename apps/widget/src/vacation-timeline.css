@@ -862,3 +862,133 @@
   -webkit-tap-highlight-color: transparent !important;
   -webkit-focus-ring-color: transparent !important;
 }
+
+/* ==========================================================================
+   STAFFBASE OVERRIDE: Fix hover contrast for all interactive elements
+   Staffbase injects dark backgrounds on hover - force light bg with dark text
+   ========================================================================== */
+
+/* Date picker trigger (dropdown button) */
+.vt-widget .vt-header__date-trigger:hover,
+.vt-widget .vt-header__date-trigger:focus,
+.vt-widget .vt-header__date-trigger:active,
+.vt-widget button.vt-header__date-trigger:hover {
+  background-color: #f5f5f5 !important;
+  background: #f5f5f5 !important;
+  color: #171717 !important;
+  border-color: #d4d4d4 !important;
+}
+
+/* Date picker dropdown options */
+.vt-widget .vt-header__date-option:hover,
+.vt-widget .vt-header__date-option:focus,
+.vt-widget button.vt-header__date-option:hover {
+  background-color: #f5f5f5 !important;
+  background: #f5f5f5 !important;
+  color: #171717 !important;
+}
+
+/* Team members filter trigger */
+.vt-widget .vt-filter__trigger:hover,
+.vt-widget .vt-filter__trigger:focus,
+.vt-widget .vt-filter__trigger:active,
+.vt-widget button.vt-filter__trigger:hover {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #171717 !important;
+  border-color: #a3a3a3 !important;
+}
+
+/* Team members dropdown options */
+.vt-widget .vt-filter__option:hover,
+.vt-widget .vt-filter__option:focus,
+.vt-widget button.vt-filter__option:hover {
+  background-color: #f5f5f5 !important;
+  background: #f5f5f5 !important;
+  color: #171717 !important;
+}
+
+/* Header navigation buttons (arrows, today) */
+.vt-widget .vt-header__btn:hover,
+.vt-widget .vt-header__btn:focus,
+.vt-widget .vt-header__btn:active,
+.vt-widget button.vt-header__btn:hover {
+  background-color: #f5f5f5 !important;
+  background: #f5f5f5 !important;
+  color: #171717 !important;
+}
+
+/* Header icon buttons (arrow navigation) */
+.vt-widget .vt-header__btn--icon:hover,
+.vt-widget .vt-header__btn--icon:focus,
+.vt-widget button.vt-header__btn--icon:hover {
+  background-color: #f5f5f5 !important;
+  background: #f5f5f5 !important;
+  color: #171717 !important;
+}
+
+/* Today button - keep dark bg with light text */
+.vt-widget .vt-header__btn--today:hover,
+.vt-widget .vt-header__btn--today:focus,
+.vt-widget button.vt-header__btn--today:hover {
+  background-color: #262626 !important;
+  background: #262626 !important;
+  color: #ffffff !important;
+  border-color: #262626 !important;
+}
+
+/* View toggle buttons (Day/Week/Month) - inactive state */
+.vt-widget .vt-header__view-btn:hover:not(.vt-header__view-btn--active),
+.vt-widget .vt-header__view-btn:focus:not(.vt-header__view-btn--active),
+.vt-widget button.vt-header__view-btn:hover:not(.vt-header__view-btn--active) {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: #171717 !important;
+}
+
+/* View toggle buttons - active state (keep brand color) */
+.vt-widget .vt-header__view-btn--active,
+.vt-widget .vt-header__view-btn--active:hover,
+.vt-widget .vt-header__view-btn--active:focus {
+  background-color: #f97316 !important;
+  background: #f97316 !important;
+  color: #ffffff !important;
+}
+
+/* Request Time Off button */
+.vt-widget .vt-tabs__request-btn:hover,
+.vt-widget .vt-tabs__request-btn:focus,
+.vt-widget button.vt-tabs__request-btn:hover {
+  background-color: #fff8f1 !important;
+  background: #fff8f1 !important;
+  color: #ea580c !important;
+  border-color: #ea580c !important;
+}
+
+/* Generic button hover - ensure all buttons have proper contrast */
+.vt-widget button:hover,
+.vt-widget button:focus {
+  color: #171717 !important;
+}
+
+/* Exception: Buttons with white text should keep it */
+.vt-widget .vt-header__btn--today:hover,
+.vt-widget .vt-header__btn--outlook:hover,
+.vt-widget .vt-header__view-btn--active:hover,
+.vt-widget .vt-tabs__badge--approvals,
+.vt-widget [class*="--primary"]:hover {
+  color: #ffffff !important;
+}
+
+/* Dark mode overrides - use light text on dark backgrounds */
+.vt-widget--dark .vt-header__date-trigger:hover,
+.vt-widget--dark .vt-header__date-option:hover,
+.vt-widget--dark .vt-filter__trigger:hover,
+.vt-widget--dark .vt-filter__option:hover,
+.vt-widget--dark .vt-header__btn:hover,
+.vt-widget--dark .vt-header__btn--icon:hover,
+.vt-widget--dark .vt-header__view-btn:hover:not(.vt-header__view-btn--active) {
+  background-color: #2a2a2a !important;
+  background: #2a2a2a !important;
+  color: #f5f5f5 !important;
+}
