@@ -866,43 +866,52 @@
 /* ==========================================================================
    STAFFBASE OVERRIDE: Fix hover contrast for all interactive elements
    Staffbase injects dark backgrounds on hover - force light bg with dark text
+   Using maximum specificity with repeated class selectors
    ========================================================================== */
 
-/* Date picker trigger (dropdown button) */
-.vt-widget .vt-header__date-trigger:hover,
-.vt-widget .vt-header__date-trigger:focus,
-.vt-widget .vt-header__date-trigger:active,
-.vt-widget button.vt-header__date-trigger:hover {
+/* Date picker trigger (dropdown button) - MAXIMUM SPECIFICITY */
+.vt-widget.vt-widget .vt-header__date-trigger:hover,
+.vt-widget.vt-widget .vt-header__date-trigger:focus,
+.vt-widget.vt-widget .vt-header__date-trigger:active,
+.vt-widget.vt-widget button.vt-header__date-trigger:hover,
+div.vt-widget .vt-header .vt-header__date-trigger:hover,
+[class*="vt-widget"] [class*="vt-header__date-trigger"]:hover {
   background-color: #f5f5f5 !important;
   background: #f5f5f5 !important;
   color: #171717 !important;
   border-color: #d4d4d4 !important;
 }
 
-/* Date picker dropdown options */
-.vt-widget .vt-header__date-option:hover,
-.vt-widget .vt-header__date-option:focus,
-.vt-widget button.vt-header__date-option:hover {
+/* Date picker dropdown options - MAXIMUM SPECIFICITY */
+.vt-widget.vt-widget .vt-header__date-option:hover,
+.vt-widget.vt-widget .vt-header__date-option:focus,
+.vt-widget.vt-widget button.vt-header__date-option:hover,
+div.vt-widget .vt-header__date-menu .vt-header__date-option:hover,
+[class*="vt-widget"] [class*="vt-header__date-option"]:hover {
   background-color: #f5f5f5 !important;
   background: #f5f5f5 !important;
   color: #171717 !important;
 }
 
-/* Team members filter trigger */
-.vt-widget .vt-filter__trigger:hover,
-.vt-widget .vt-filter__trigger:focus,
-.vt-widget .vt-filter__trigger:active,
-.vt-widget button.vt-filter__trigger:hover {
+/* Team members filter trigger - MAXIMUM SPECIFICITY */
+.vt-widget.vt-widget .vt-filter__trigger:hover,
+.vt-widget.vt-widget .vt-filter__trigger:focus,
+.vt-widget.vt-widget .vt-filter__trigger:active,
+.vt-widget.vt-widget button.vt-filter__trigger:hover,
+div.vt-widget .vt-filter .vt-filter__trigger:hover,
+[class*="vt-widget"] [class*="vt-filter__trigger"]:hover {
   background-color: #ffffff !important;
   background: #ffffff !important;
   color: #171717 !important;
   border-color: #a3a3a3 !important;
 }
 
-/* Team members dropdown options */
-.vt-widget .vt-filter__option:hover,
-.vt-widget .vt-filter__option:focus,
-.vt-widget button.vt-filter__option:hover {
+/* Team members dropdown options - MAXIMUM SPECIFICITY */
+.vt-widget.vt-widget .vt-filter__option:hover,
+.vt-widget.vt-widget .vt-filter__option:focus,
+.vt-widget.vt-widget button.vt-filter__option:hover,
+div.vt-widget .vt-filter__menu .vt-filter__option:hover,
+[class*="vt-widget"] [class*="vt-filter__option"]:hover {
   background-color: #f5f5f5 !important;
   background: #f5f5f5 !important;
   color: #171717 !important;
