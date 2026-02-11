@@ -3,7 +3,7 @@
  * Supports both shared calendar and per-user calendar modes.
  */
 
-import { graphGetWithParams } from './graphClient';
+import { graphGetWithParams, graphDelete } from './graphClient';
 import { getConfig } from '../utils/env';
 import { Logger } from '../utils/logger';
 import {
@@ -269,4 +269,92 @@ export async function getVacations(
     });
     throw error;
   }
+}
+
+
+/**
+ * Deletes a calendar event from the shared calendar.
+ * 
+ * @param eventId - The Graph API event ID
+ * @param logger - Optional logger
+ */
+export async function deleteCalendarEvent(
+  eventId: string,
+  logger?: Logger
+): Promise<void> {
+  const config = getConfig();
+
+  if (!config.vacationCalendarMailbox) {
+    throw new ApiError(
+      ErrorCodes.ConfigurationError,
+      "Shared calendar mailbox not configured",
+      500
+    );
+  }
+
+  logger?.info("Deleting calendar event", {
+    eventId,
+    mailbox: config.vacationCalendarMailbox,
+  });
+
+  const endpoint = `/users/${encodeURIComponent(config.vacationCalendarMailbox)}/calendar/events/${encodeURIComponent(eventId)}`;
+
+  await graphDelete(endpoint, logger);
+
+  logger?.info("Calendar event deleted successfully", { eventId });
+}
+
+/**
+ * Finds and deletes calendar events by subject search.
+ * Useful for cleaning up test data.
+ * 
+ * @param searchTerm - Text to search for in event subjects
+ * @param logger - Optional logger
+ * @returns Number of events deleted
+ */
+export async function deleteEventsBySubject(
+  searchTerm: string,
+  logger?: Logger
+): Promise<{ deleted: number; events: Array<{ id: string; subject: string }> }> {
+  const config = getConfig();
+
+  if (!config.vacationCalendarMailbox) {
+    throw new ApiError(
+      ErrorCodes.ConfigurationError,
+      "Shared calendar mailbox not configured",
+      500
+    );
+  }
+
+  logger?.info("Searching for events to delete", { searchTerm });
+
+  // Search for events with the subject
+  const endpoint = `/users/${encodeURIComponent(config.vacationCalendarMailbox)}/calendar/events`;
+  const response = await graphGetWithParams<{ value: GraphCalendarEvent[] }>(
+    endpoint,
+    {
+      "$filter": `contains(subject, '${searchTerm}')`,
+      "$select": "id,subject,start,end",
+      "$top": "50",
+    },
+    logger
+  );
+
+  const events = response.value || [];
+  const deletedEvents: Array<{ id: string; subject: string }> = [];
+
+  for (const event of events) {
+    try {
+      await deleteCalendarEvent(event.id, logger);
+      deletedEvents.push({ id: event.id, subject: event.subject });
+    } catch (error) {
+      logger?.warn("Failed to delete event", {
+        eventId: event.id,
+        subject: event.subject,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  return { deleted: deletedEvents.length, events: deletedEvents };
 }

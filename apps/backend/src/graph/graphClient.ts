@@ -195,3 +195,31 @@ export async function graphPatch<T>(
     throw error;
   }
 }
+
+/**
+ * Makes a DELETE request to the Graph API.
+ */
+export async function graphDelete(
+  endpoint: string,
+  logger?: Logger
+): Promise<void> {
+  const client = getGraphClient(logger);
+  const startTime = Date.now();
+
+  try {
+    logger?.debug('Graph DELETE request', { endpoint });
+    await client.api(endpoint).delete();
+    logger?.debug('Graph DELETE completed', {
+      endpoint,
+      durationMs: Date.now() - startTime,
+    });
+  } catch (error) {
+    const diagnostic = diagnoseGraphError(error, `DELETE ${endpoint}`);
+    logDiagnostic(logger, diagnostic.code, {
+      ...diagnostic.context,
+      endpoint,
+      durationMs: Date.now() - startTime,
+    });
+    throw error;
+  }
+}
