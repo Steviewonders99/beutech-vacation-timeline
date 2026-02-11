@@ -11,8 +11,11 @@ import { DiagnosticCode } from './diagnostics';
 
 /**
  * Action types that can be performed via token.
+ * - 'approve': Directly approve the request
+ * - 'reject': Directly reject (used internally after form submission)
+ * - 'reject_form': Show rejection form to collect reason
  */
-export type ActionType = 'approve' | 'reject';
+export type ActionType = 'approve' | 'reject' | 'reject_form';
 
 /**
  * Payload encoded in the action token.
@@ -145,7 +148,7 @@ export function validateActionToken(token: string): ActionTokenPayload {
     throw new Error('Invalid token payload');
   }
 
-  if (payload.action !== 'approve' && payload.action !== 'reject') {
+  if (payload.action !== 'approve' && payload.action !== 'reject' && payload.action !== 'reject_form') {
     console.error(`[${DiagnosticCode.ACTION_TOKEN_WEAK}] Invalid action type: ${payload.action}`);
     throw new Error('Invalid action type');
   }
@@ -167,7 +170,8 @@ export function generateActionUrls(
   supervisorEmail: string
 ): { approveUrl: string; rejectUrl: string } {
   const approveToken = generateActionToken(requestId, 'approve', supervisorEmail);
-  const rejectToken = generateActionToken(requestId, 'reject', supervisorEmail);
+  // Use 'reject_form' to show a form where supervisor can enter rejection reason
+  const rejectToken = generateActionToken(requestId, 'reject_form', supervisorEmail);
 
   return {
     approveUrl: `${baseUrl}/requests/action?token=${encodeURIComponent(approveToken)}`,

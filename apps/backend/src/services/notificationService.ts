@@ -86,85 +86,192 @@ function generateNewRequestEmailHtml(
   const dayCount = getDayCount(request.startDate, request.endDate);
   const dayWord = dayCount === 1 ? 'day' : 'days';
 
-  // Action buttons HTML (only if URLs provided)
+  // Outlook-compatible action buttons using tables and VML
+  // Note: Outlook doesn't support CSS gradients, border-radius on buttons, or display:inline-block reliably
   const actionButtonsHtml = actionUrls
     ? `
-      <div class="action-buttons" style="margin-top: 24px; text-align: center;">
-        <a href="${actionUrls.approveUrl}"
-           class="btn btn-approve"
-           style="display: inline-block; padding: 14px 32px; margin: 8px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px; background: linear-gradient(135deg, #22c55e, #16a34a); color: white;">
-          ✓ Approve Request
-        </a>
-        <a href="${actionUrls.rejectUrl}"
-           class="btn btn-reject"
-           style="display: inline-block; padding: 14px 32px; margin: 8px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">
-          ✗ Decline Request
-        </a>
-      </div>
+      <!--[if mso]>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 24px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding: 8px;">
+                  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${actionUrls.approveUrl}" style="height:48px;v-text-anchor:middle;width:180px;" arcsize="17%" strokecolor="#16a34a" fillcolor="#22c55e">
+                    <w:anchorlock/>
+                    <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">&#10003; Approve</center>
+                  </v:roundrect>
+                </td>
+                <td style="padding: 8px;">
+                  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${actionUrls.rejectUrl}" style="height:48px;v-text-anchor:middle;width:180px;" arcsize="17%" strokecolor="#dc2626" fillcolor="#ef4444">
+                    <w:anchorlock/>
+                    <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">&#10007; Decline</center>
+                  </v:roundrect>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <![endif]-->
+      <!--[if !mso]><!-->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 24px;">
+        <tr>
+          <td align="center">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding: 8px;">
+                  <a href="${actionUrls.approveUrl}" style="display: inline-block; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px; background-color: #22c55e; color: #ffffff; mso-padding-alt: 0; text-align: center;">
+                    <!--[if mso]><i style="letter-spacing: 32px; mso-font-width: -100%; mso-text-raise: 30pt;">&nbsp;</i><![endif]-->
+                    <span style="mso-text-raise: 15pt;">&#10003; Approve</span>
+                    <!--[if mso]><i style="letter-spacing: 32px; mso-font-width: -100%;">&nbsp;</i><![endif]-->
+                  </a>
+                </td>
+                <td style="padding: 8px;">
+                  <a href="${actionUrls.rejectUrl}" style="display: inline-block; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px; background-color: #ef4444; color: #ffffff; mso-padding-alt: 0; text-align: center;">
+                    <!--[if mso]><i style="letter-spacing: 32px; mso-font-width: -100%; mso-text-raise: 30pt;">&nbsp;</i><![endif]-->
+                    <span style="mso-text-raise: 15pt;">&#10007; Decline</span>
+                    <!--[if mso]><i style="letter-spacing: 32px; mso-font-width: -100%;">&nbsp;</i><![endif]-->
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <!--<![endif]-->
       <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 12px;">
         These action links expire in 24 hours
       </p>
     `
     : `
-      <div class="action-section" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-        <p style="margin: 0;"><strong>Action Required:</strong> Please review and approve or reject this request in the Vacation Timeline widget.</p>
-      </div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 20px;">
+        <tr>
+          <td style="padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+            <p style="margin: 0;"><strong>Action Required:</strong> Please review and approve or reject this request in the Vacation Timeline widget.</p>
+          </td>
+        </tr>
+      </table>
     `;
 
+  // Outlook-compatible email using tables for layout
   return `
 <!DOCTYPE html>
-<html>
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #ed9236, #f5a623); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-    .content { background: #fff; border: 1px solid #e5e5e5; border-top: none; padding: 20px; border-radius: 0 0 8px 8px; }
-    .detail-row { display: flex; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
-    .detail-label { font-weight: 600; width: 120px; color: #666; }
-    .detail-value { flex: 1; }
-    .footer { margin-top: 20px; font-size: 12px; color: #888; text-align: center; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--[if mso]>
+  <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+  </xml>
+  <![endif]-->
+  <style type="text/css">
+    body { margin: 0; padding: 0; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; line-height: 1.6; color: #333333; }
+    table { border-collapse: collapse; }
+    img { border: 0; line-height: 100%; outline: none; text-decoration: none; }
+    a { color: inherit; text-decoration: none; }
+    @media only screen and (max-width: 620px) {
+      .container { width: 100% !important; }
+      .button { width: 100% !important; display: block !important; }
+    }
   </style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h2 style="margin: 0;">New Time-Off Request</h2>
-      <p style="margin: 5px 0 0 0; opacity: 0.9;">Awaiting your approval</p>
-    </div>
-    <div class="content">
-      <p><strong>${request.requesterName}</strong> has submitted a time-off request that requires your approval.</p>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f5f5;">
+    <tr>
+      <td align="center" style="padding: 20px;">
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #ed9236; padding: 24px 30px;">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #ffffff;">New Time-Off Request</h1>
+              <p style="margin: 5px 0 0 0; font-size: 14px; color: #ffffff; opacity: 0.9;">Awaiting your approval</p>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding: 30px;">
+              <p style="margin: 0 0 20px 0; font-size: 16px; color: #333333;">
+                <strong>${request.requesterName}</strong> has submitted a time-off request that requires your approval.
+              </p>
 
-      <div class="detail-row">
-        <span class="detail-label">Employee:</span>
-        <span class="detail-value">${request.requesterName} (${request.requesterEmail})</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Leave Type:</span>
-        <span class="detail-value" style="text-transform: capitalize;">${request.leaveType}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Dates:</span>
-        <span class="detail-value">${formatDate(request.startDate)} - ${formatDate(request.endDate)}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Duration:</span>
-        <span class="detail-value">${dayCount} ${dayWord}</span>
-      </div>
-      ${request.reason ? `
-      <div class="detail-row">
-        <span class="detail-label">Reason:</span>
-        <span class="detail-value">${request.reason}</span>
-      </div>
-      ` : ''}
+              <!-- Details Table -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                <tr>
+                  <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td width="120" style="font-weight: 600; color: #666666; font-size: 14px;">Employee:</td>
+                        <td style="color: #333333; font-size: 14px;">${request.requesterName} (${request.requesterEmail})</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td width="120" style="font-weight: 600; color: #666666; font-size: 14px;">Leave Type:</td>
+                        <td style="color: #333333; font-size: 14px; text-transform: capitalize;">${request.leaveType}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td width="120" style="font-weight: 600; color: #666666; font-size: 14px;">Dates:</td>
+                        <td style="color: #333333; font-size: 14px;">${formatDate(request.startDate)} - ${formatDate(request.endDate)}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td width="120" style="font-weight: 600; color: #666666; font-size: 14px;">Duration:</td>
+                        <td style="color: #333333; font-size: 14px;">${dayCount} ${dayWord}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                ${request.reason ? `
+                <tr>
+                  <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td width="120" style="font-weight: 600; color: #666666; font-size: 14px; vertical-align: top;">Reason:</td>
+                        <td style="color: #333333; font-size: 14px;">${request.reason}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                ` : ''}
+              </table>
 
-      ${actionButtonsHtml}
-
-      <div class="footer">
-        <p>This is an automated message from the Beutech Vacation Timeline system.</p>
-      </div>
-    </div>
-  </div>
+              <!-- Action Buttons -->
+              ${actionButtonsHtml}
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 20px 30px; background-color: #f9fafb; border-top: 1px solid #e5e5e5;">
+              <p style="margin: 0; font-size: 12px; color: #888888; text-align: center;">
+                This is an automated message from the Beutech Vacation Timeline system.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
   `.trim();
