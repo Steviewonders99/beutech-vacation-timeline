@@ -535,12 +535,46 @@
 }
 
 .vt-tabs__tab:hover {
-  background: var(--bt-background);
+  background: var(--bt-muted);
   color: var(--bt-foreground);
 }
 
 .vt-tabs__tab:hover .vt-tabs__icon {
   opacity: 1;
+}
+
+/* Fix for Staffbase hover/focus state override */
+/* Staffbase may apply dark backgrounds - ensure proper contrast */
+.vt-widget .vt-tabs__tab:hover,
+.vt-widget .vt-tabs__tab:focus,
+.vt-widget .vt-tabs__tab:focus-visible,
+.vt-widget .vt-tabs__tab:active {
+  background: var(--bt-muted) !important;
+  background-color: var(--bt-muted) !important;
+  color: var(--bt-foreground) !important;
+  outline: none !important;
+}
+
+/* Ensure text and icons inherit the correct color */
+.vt-widget .vt-tabs__tab:hover .vt-tabs__text,
+.vt-widget .vt-tabs__tab:hover .vt-tabs__icon,
+.vt-widget .vt-tabs__tab:focus .vt-tabs__text,
+.vt-widget .vt-tabs__tab:focus .vt-tabs__icon,
+.vt-widget .vt-tabs__tab:focus-visible .vt-tabs__text,
+.vt-widget .vt-tabs__tab:focus-visible .vt-tabs__icon {
+  color: var(--bt-foreground) !important;
+}
+
+/* Override any external dark hover backgrounds with white text */
+.vt-tabs__tab[style*="background"] {
+  color: #ffffff !important;
+}
+
+/* Force tab button styling to override Staffbase button resets */
+.vt-widget button.vt-tabs__tab:hover,
+.vt-widget button.vt-tabs__tab:focus {
+  background: var(--bt-muted) !important;
+  color: var(--bt-foreground) !important;
 }
 
 .vt-tabs__tab--active {
