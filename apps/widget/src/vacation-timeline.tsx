@@ -103,6 +103,33 @@ export const VacationTimeline = ({
       sharedCalendarMailbox,
     });
   }, [apiBaseUrl, apiKey, propsApiBaseUrl, calendarMode, sharedCalendarMailbox]);
+
+  // TEMPORARY DEBUG: Call debug endpoint to discover the actual Origin header
+  // DELETE THIS after CORS debugging is complete
+  useEffect(() => {
+    if (!apiBaseUrl) return;
+    const debugUrl = `${apiBaseUrl.replace(/\/$/, '')}/api/debug/headers`;
+    console.log('[VacationTimeline] DEBUG: Calling', debugUrl, 'from origin:', window.location.origin);
+    console.log('[VacationTimeline] DEBUG: window.location =', {
+      href: window.location.href,
+      origin: window.location.origin,
+      hostname: window.location.hostname,
+      protocol: window.location.protocol,
+    });
+    fetch(debugUrl)
+      .then(res => res.json())
+      .then(data => {
+        console.log('[VacationTimeline] DEBUG HEADERS RESPONSE:', JSON.stringify(data, null, 2));
+        console.log('[VacationTimeline] DEBUG ORIGIN SENT:', data.origin);
+        console.log('[VacationTimeline] DEBUG USER-AGENT:', data.userAgent);
+        console.log('[VacationTimeline] DEBUG REFERER:', data.referer);
+      })
+      .catch(err => {
+        console.error('[VacationTimeline] DEBUG endpoint failed:', err.message);
+        console.log('[VacationTimeline] DEBUG: This failure itself may indicate a CORS block');
+      });
+  }, [apiBaseUrl]);
+
   // Initialize i18n with Staffbase language
   const { t } = useLanguage(contentLanguage);
 
