@@ -26,6 +26,7 @@ const TRUSTED_ORIGINS = [
  */
 const TRUSTED_ORIGIN_SUFFIXES = [
   '.staffbase.com',
+  '.beautech.aero',
 ];
 
 /**
