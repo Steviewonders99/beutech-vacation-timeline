@@ -94,7 +94,94 @@ export async function createRequest(
     const requesterInfo = await getUserInfo(input.requesterEmail, logger);
     logger?.debug('Got requester info', { requesterId: requesterInfo.id });
 
-    // Get manager (supervisor) from Microsoft Graph
+    // Check if requester is in the auto-approve list (e.g. CEO, executives)
+    const config = getConfig();
+    const isAutoApprove = config.autoApproveEmails.includes(
+      input.requesterEmail.toLowerCase()
+    );
+
+    if (isAutoApprove) {
+      logger?.info('Auto-approving request for executive', {
+        requesterEmail: input.requesterEmail,
+      });
+
+      // Insert as approved, supervisor = self (no manager lookup needed)
+      const autoSql = `
+        INSERT INTO time_off_requests (
+          requester_email, requester_name, requester_id,
+          supervisor_email, supervisor_name, supervisor_id,
+          start_date, end_date, leave_type, reason,
+          status, status_changed_at, status_changed_by
+        ) VALUES (
+          $1, $2, $3,
+          $4, $5, $6,
+          $7, $8, $9, $10,
+          'approved', NOW(), $11
+        )
+        RETURNING *
+      `;
+
+      const autoParams = [
+        input.requesterEmail,
+        input.requesterName,
+        requesterInfo.id,
+        input.requesterEmail,   // supervisor = self
+        input.requesterName,    // supervisor name = self
+        requesterInfo.id,       // supervisor id = self
+        input.startDate,
+        input.endDate,
+        input.leaveType || 'vacation',
+        input.reason || null,
+        input.requesterEmail,   // status_changed_by
+      ];
+
+      const autoRows = await query<TimeOffRequestRow>(autoSql, autoParams, logger);
+
+      if (autoRows.length === 0) {
+        throw new Error('Insert did not return a row');
+      }
+
+      let autoRequest = toTimeOffRequest(autoRows[0]);
+
+      // Create calendar event
+      const calendarEventId = await createCalendarEvent(autoRequest, logger);
+
+      // Update record with calendar event ID
+      const updateSql = `
+        UPDATE time_off_requests
+        SET calendar_event_id = $2, updated_at = NOW()
+        WHERE id = $1
+        RETURNING *
+      `;
+
+      const updatedRows = await query<TimeOffRequestRow>(
+        updateSql,
+        [autoRequest.id, calendarEventId],
+        logger
+      );
+
+      if (updatedRows.length > 0) {
+        autoRequest = toTimeOffRequest(updatedRows[0]);
+      }
+
+      // Notify requester of approval (async, skip supervisor notification)
+      const senderEmail = config.vacationCalendarMailbox || input.requesterEmail;
+      notifyRequesterOfApproval(autoRequest, senderEmail, logger).catch((err) => {
+        logger?.warn('Failed to send auto-approval notification', {
+          error: err instanceof Error ? err.message : String(err),
+        });
+      });
+
+      logger?.endOperation('createRequest', startTime, {
+        requestId: autoRequest.id,
+        autoApproved: true,
+        calendarEventId,
+      });
+
+      return autoRequest;
+    }
+
+    // Standard flow: get manager and create pending request
     const manager = await getManager(input.requesterEmail, logger);
     logger?.debug('Got manager info', {
       managerEmail: manager.email,
@@ -139,7 +226,6 @@ export async function createRequest(
     const request = toTimeOffRequest(rows[0]);
 
     // Send notifications (async, don't block on failure)
-    const config = getConfig();
     const senderEmail = config.vacationCalendarMailbox || input.requesterEmail;
 
     // Pass API base URL for actionable email buttons
@@ -287,6 +373,8 @@ async function createCalendarEvent(
   });
 
   // Create all-day event
+  // Include requester as attendee so the shared calendar event can be
+  // attributed back to the correct person when reading events later.
   const event = {
     subject: `${request.requesterName} - ${request.leaveType.charAt(0).toUpperCase() + request.leaveType.slice(1)}`,
     start: {
@@ -301,6 +389,15 @@ async function createCalendarEvent(
     isAllDay: true,
     showAs: 'oof', // Out of Office
     categories: [config.vacationCategory],
+    attendees: [
+      {
+        emailAddress: {
+          address: request.requesterEmail,
+          name: request.requesterName,
+        },
+        type: 'required',
+      },
+    ],
     body: {
       contentType: 'text',
       content: request.reason || `Time off: ${request.leaveType}`,

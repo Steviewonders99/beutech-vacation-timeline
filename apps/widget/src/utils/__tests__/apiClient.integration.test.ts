@@ -58,7 +58,8 @@ describe('API Client Integration', () => {
 
       // Check headers
       expect(options.headers['x-api-key']).toBe('test-api-key-12345');
-      expect(options.headers['Content-Type']).toBe('application/json');
+      // GET requests omit Content-Type to avoid triggering CORS preflight
+      expect(options.headers['Content-Type']).toBeUndefined();
       // GET is the default method for fetch, so it may not be explicitly set
       expect(options.method || 'GET').toBe('GET');
     });
@@ -364,8 +365,9 @@ describe('API Client Integration', () => {
 
       // Verify required headers per API contract
       expect(options.headers).toHaveProperty('x-api-key');
-      expect(options.headers).toHaveProperty('Content-Type');
-      expect(options.headers['Content-Type']).toBe('application/json');
+      // GET requests intentionally omit Content-Type to keep them as
+      // CORS "simple requests" and avoid triggering a preflight OPTIONS
+      expect(options.headers['Content-Type']).toBeUndefined();
     });
 
     it('should properly encode special characters in query parameters', async () => {

@@ -19,14 +19,43 @@ const TRUSTED_ORIGINS = [
 ];
 
 /**
+ * Trusted origin patterns for wildcard subdomain matching.
+ * The Staffbase mobile app (iOS/Android) uses WebView origins
+ * that may differ from the desktop web domain (e.g. app.staffbase.com,
+ * *.staffbase.com, or platform-specific origins).
+ */
+const TRUSTED_ORIGIN_SUFFIXES = [
+  '.staffbase.com',
+];
+
+/**
  * Checks if the request origin is trusted (for keyless auth).
+ * Supports exact matches and wildcard subdomain matching for
+ * known platform domains (e.g. Staffbase mobile app).
  */
 function isTrustedOrigin(request: HttpRequest): boolean {
   const origin = request.headers.get('Origin');
   if (!origin) return false;
-  return TRUSTED_ORIGINS.some(trusted =>
-    origin.toLowerCase() === trusted.toLowerCase()
-  );
+  const lowerOrigin = origin.toLowerCase();
+
+  // Exact match against hardcoded trusted origins
+  if (TRUSTED_ORIGINS.some(trusted => lowerOrigin === trusted.toLowerCase())) {
+    return true;
+  }
+
+  // Wildcard subdomain match: any https://*.staffbase.com on standard port
+  try {
+    const url = new URL(lowerOrigin);
+    if (url.protocol === 'https:' && (url.port === '' || url.port === '443')) {
+      return TRUSTED_ORIGIN_SUFFIXES.some(suffix =>
+        url.hostname.endsWith(suffix)
+      );
+    }
+  } catch {
+    // Invalid URL format, not trusted
+  }
+
+  return false;
 }
 
 /**
@@ -138,8 +167,10 @@ export function validateOrigin(request: HttpRequest, logger?: Logger): string | 
   // Log detailed CORS diagnostic
   logDiagnostic(logger, DiagnosticCode.CORS_ORIGIN_MISMATCH, {
     requestOrigin: origin,
-    allowedOrigins: [...TRUSTED_ORIGINS, ...config.allowedOrigins],
-    hint: 'Add the exact origin (including https://) to ALLOWED_ORIGINS environment variable',
+    trustedOrigins: TRUSTED_ORIGINS,
+    trustedSuffixes: TRUSTED_ORIGIN_SUFFIXES,
+    configuredOrigins: config.allowedOrigins,
+    hint: 'Add the exact origin (including https://) to ALLOWED_ORIGINS environment variable, or verify it matches a trusted suffix pattern',
     checkProtocol: origin.startsWith('http://') ? 'WARNING: Request uses http://, but most Staffbase domains use https://' : undefined,
   });
   return null;
@@ -153,7 +184,7 @@ export function getCorsHeaders(request: HttpRequest, logger?: Logger): Record<st
   const origin = validateOrigin(request, logger);
 
   const headers: Record<string, string> = {
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, x-api-key',
     'Access-Control-Max-Age': '86400',
   };

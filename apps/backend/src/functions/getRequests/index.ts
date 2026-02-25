@@ -149,9 +149,8 @@ async function getRequestsHandler(
 }
 
 // Register the function
-// Note: OPTIONS is handled by createRequest for this route
 app.http('getRequests', {
-  methods: ['GET'],
+  methods: ['GET', 'OPTIONS'],
   authLevel: 'anonymous',
   route: 'requests',
   handler: getRequestsHandler,

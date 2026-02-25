@@ -135,7 +135,7 @@ Or set manually in Azure Portal:
 | `DATABASE_URL` | `postgresql://vtadmin:...` | From infrastructure deployment |
 | `API_KEY` | Generate secure key | Widget authentication |
 | `VACATION_CALENDAR_MAILBOX` | `vacations@beutech.com` | Calendar mailbox |
-| `ALLOWED_ORIGINS` | `https://beutech.staffbase.com` | Staffbase domain |
+| `ALLOWED_ORIGINS` | `https://beautech.staffbase.com,https://app.staffbase.com` | Staffbase domains (web + mobile) |
 | `API_BASE_URL` | `https://func-vacationtimeline-prod.azurewebsites.net/api` | Enables email action buttons |
 | `CALENDAR_MODE` | `shared` | Use shared calendar |
 | `VACATION_CATEGORY` | `Vacation` | Calendar category |

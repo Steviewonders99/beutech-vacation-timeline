@@ -88,8 +88,10 @@ async function getVacationsFromSharedCalendar(
 
       // Parse the subject to extract the person's name
       // Common patterns: "Name - Vacation", "Name - PTO", "Name - Time Off"
+      // Require spaces around the dash to avoid splitting hyphenated names
+      // like "Philip Hix-Coquet" at the inner hyphen.
       if (event.subject) {
-        const subjectMatch = event.subject.match(/^(.+?)\s*[-–—]\s*/);
+        const subjectMatch = event.subject.match(/^(.+?)\s+[-–—]\s+/);
         if (subjectMatch && subjectMatch[1]) {
           userName = subjectMatch[1].trim();
         } else {
@@ -99,18 +101,31 @@ async function getVacationsFromSharedCalendar(
       }
 
       // Try to find the actual user email from attendees
-      // The first attendee (not the organizer) is likely the person taking vacation
+      // The first attendee (not the organizer/mailbox) is the person taking vacation
+      let foundAttendee = false;
       if (event.attendees && event.attendees.length > 0) {
         const attendee = event.attendees.find(
           (a) => a.emailAddress?.address?.toLowerCase() !== config.vacationCalendarMailbox?.toLowerCase()
         );
         if (attendee?.emailAddress?.address) {
           userEmail = attendee.emailAddress.address;
+          foundAttendee = true;
           // If we didn't get a name from subject, use attendee name
           if (userName === 'Unknown' && attendee.emailAddress.name) {
             userName = attendee.emailAddress.name;
           }
         }
+      }
+
+      // Fallback: if no attendee found AND the organizer is the shared mailbox,
+      // derive a unique user ID from the parsed name so that events for
+      // different people are not collapsed into one user.
+      if (
+        !foundAttendee &&
+        userName !== 'Unknown' &&
+        userEmail.toLowerCase() === config.vacationCalendarMailbox?.toLowerCase()
+      ) {
+        userEmail = userName.toLowerCase().replace(/\s+/g, '.') + '@calendar.local';
       }
 
       return toVacationEvent(event, userEmail, userName);

@@ -33,6 +33,9 @@ export interface AppConfig {
   // API Configuration
   apiBaseUrl?: string; // Base URL for action links in emails
 
+  // Auto-approve
+  autoApproveEmails: string[];
+
   // Settings
   maxDateRangeDays: number;
   defaultTimezone: string;
@@ -146,6 +149,9 @@ export function loadConfig(): AppConfig {
 
     // API Configuration (for email action links)
     apiBaseUrl: process.env.API_BASE_URL,
+
+    // Auto-approve (lowercased for case-insensitive comparison)
+    autoApproveEmails: getListEnv('AUTO_APPROVE_EMAILS').map((e) => e.toLowerCase()),
 
     // Settings
     maxDateRangeDays: getIntEnv('MAX_DATE_RANGE_DAYS', Defaults.MAX_DATE_RANGE_DAYS),

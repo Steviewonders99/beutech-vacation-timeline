@@ -78,9 +78,15 @@ export function createApiClient(config: ApiClientConfig) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    // Build headers - only include API key if provided
+    // Build headers - only include API key if provided.
+    // Only set Content-Type for requests with a body (POST, PUT, PATCH, DELETE).
+    // Omitting it on GET/HEAD keeps these as CORS "simple requests" which
+    // avoids triggering a preflight OPTIONS request that the Azure platform
+    // may intercept before our function code can handle it.
+    const method = (options.method || 'GET').toUpperCase();
+    const needsContentType = options.body !== undefined || !['GET', 'HEAD'].includes(method);
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(needsContentType ? { 'Content-Type': 'application/json' } : {}),
       ...(options.headers as Record<string, string>),
     };
     if (apiKey) {

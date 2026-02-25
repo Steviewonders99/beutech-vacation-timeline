@@ -173,8 +173,10 @@ export function generateActionUrls(
   // Use 'reject_form' to show a form where supervisor can enter rejection reason
   const rejectToken = generateActionToken(requestId, 'reject_form', supervisorEmail);
 
+  // Normalize: strip trailing slashes, ensure /api prefix is present exactly once
+  const normalizedBase = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '');
   return {
-    approveUrl: `${baseUrl}/requests/action?token=${encodeURIComponent(approveToken)}`,
-    rejectUrl: `${baseUrl}/requests/action?token=${encodeURIComponent(rejectToken)}`,
+    approveUrl: `${normalizedBase}/api/requests/action?token=${encodeURIComponent(approveToken)}`,
+    rejectUrl: `${normalizedBase}/api/requests/action?token=${encodeURIComponent(rejectToken)}`,
   };
 }

@@ -205,6 +205,18 @@ export interface TimeOffRequestRow {
 }
 
 /**
+ * Normalizes a date value to YYYY-MM-DD string.
+ * The pg driver returns DATE columns as JavaScript Date objects at runtime,
+ * even though the TypeScript interface declares them as strings.
+ */
+function toDateString(value: string | Date): string {
+  if (value instanceof Date) {
+    return value.toISOString().split('T')[0];
+  }
+  return value;
+}
+
+/**
  * Transforms a database row to a TimeOffRequest object.
  */
 export function toTimeOffRequest(row: TimeOffRequestRow): TimeOffRequest {
@@ -216,8 +228,8 @@ export function toTimeOffRequest(row: TimeOffRequestRow): TimeOffRequest {
     supervisorEmail: row.supervisor_email,
     supervisorName: row.supervisor_name ?? undefined,
     supervisorId: row.supervisor_id ?? undefined,
-    startDate: row.start_date,
-    endDate: row.end_date,
+    startDate: toDateString(row.start_date),
+    endDate: toDateString(row.end_date),
     leaveType: row.leave_type,
     reason: row.reason ?? undefined,
     status: row.status,

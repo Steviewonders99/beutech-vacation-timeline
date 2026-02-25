@@ -55,7 +55,7 @@ curl https://func-vacationtimeline-prod.azurewebsites.net/api/health
 | DATABASE_URL | `postgresql://vtadmin:{PASS}@psql-vacationtimeline-prod.postgres.database.azure.com/vacationtimeline?sslmode=require` |
 | API_KEY | `<generate strong key>` |
 | VACATION_CALENDAR_MAILBOX | `vacations@beutech.com` |
-| ALLOWED_ORIGINS | `https://beutech.staffbase.com` |
+| ALLOWED_ORIGINS | `https://beautech.staffbase.com,https://app.staffbase.com` |
 
 ## Staffbase Widget Registration
 
