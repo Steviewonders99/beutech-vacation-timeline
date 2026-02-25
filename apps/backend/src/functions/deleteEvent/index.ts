@@ -133,8 +133,9 @@ async function deleteBySubjectHandler(
     // Validate API key
     validateApiKey(request, logger);
 
-    // Parse request body
-    const body = (await request.json()) as DeleteBySubjectInput;
+    // Parse request body (use request.text() to support text/plain Content-Type
+    // which the widget sends to avoid CORS preflight)
+    const body = JSON.parse(await request.text()) as DeleteBySubjectInput;
 
     if (!body.searchTerm || body.searchTerm.trim().length < 2) {
       throw new ApiError(

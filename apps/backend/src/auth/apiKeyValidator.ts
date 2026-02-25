@@ -72,7 +72,11 @@ function isTrustedOrigin(request: HttpRequest): boolean {
  */
 export function validateApiKey(request: HttpRequest, logger?: Logger): void {
   const config = getConfig();
-  const providedKey = request.headers.get(HttpHeaders.API_KEY);
+  // Accept API key from header OR query parameter.
+  // Query parameter ("code") avoids CORS preflight since custom headers
+  // force browsers to send an OPTIONS preflight request.
+  const url = new URL(request.url);
+  const providedKey = request.headers.get(HttpHeaders.API_KEY) || url.searchParams.get('code') || '';
   const origin = request.headers.get('Origin');
 
   // Allow requests from trusted origins without API key (CORS-secured)

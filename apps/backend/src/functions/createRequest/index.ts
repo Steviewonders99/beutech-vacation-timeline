@@ -47,8 +47,9 @@ async function createRequestHandler(
     // Validate API key
     validateApiKey(request, logger);
 
-    // Parse request body
-    const body = (await request.json()) as CreateTimeOffRequestInput;
+    // Parse request body (use request.text() to support text/plain Content-Type
+    // which the widget sends to avoid CORS preflight)
+    const body = JSON.parse(await request.text()) as CreateTimeOffRequestInput;
 
     // Validate required fields
     if (!body.requesterEmail) {

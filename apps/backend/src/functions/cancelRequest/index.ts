@@ -63,8 +63,9 @@ async function cancelRequestHandler(
       throw new ApiError(ErrorCodes.ValidationError, 'Request ID is required', 400);
     }
 
-    // Parse request body
-    const body = (await request.json()) as CancelRequestInput;
+    // Parse request body (use request.text() to support text/plain Content-Type
+    // which the widget sends to avoid CORS preflight)
+    const body = JSON.parse(await request.text()) as CancelRequestInput;
 
     if (!body.requesterEmail) {
       throw new ApiError(

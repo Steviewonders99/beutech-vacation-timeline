@@ -54,8 +54,9 @@ async function rejectRequestHandler(
       throw new ApiError(ErrorCodes.ValidationError, 'Request ID is required', 400);
     }
 
-    // Parse request body
-    const body = (await request.json()) as RejectRequestInput;
+    // Parse request body (use request.text() to support text/plain Content-Type
+    // which the widget sends to avoid CORS preflight)
+    const body = JSON.parse(await request.text()) as RejectRequestInput;
 
     if (!body.supervisorEmail) {
       throw new ApiError(

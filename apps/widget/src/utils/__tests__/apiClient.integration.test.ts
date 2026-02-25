@@ -56,9 +56,10 @@ describe('API Client Integration', () => {
       expect(url).toContain('users=user1%40test.com%2Cuser2%40test.com');
       expect(url).toContain('timezone=America%2FNew_York');
 
-      // Check headers
-      expect(options.headers['x-api-key']).toBe('test-api-key-12345');
-      // GET requests omit Content-Type to avoid triggering CORS preflight
+      // API key is sent as query parameter (not header) to avoid CORS preflight
+      expect(url).toContain('code=test-api-key-12345');
+      // No custom headers - keeps request as CORS "simple request"
+      expect(options.headers['x-api-key']).toBeUndefined();
       expect(options.headers['Content-Type']).toBeUndefined();
       // GET is the default method for fetch, so it may not be explicitly set
       expect(options.method || 'GET').toBe('GET');
@@ -190,9 +191,12 @@ describe('API Client Integration', () => {
 
       const [url, options] = mockFetch.mock.calls[0];
 
-      expect(url).toBe('https://api.example.com/api/requests');
+      // URL includes API key as query param
+      expect(url).toContain('https://api.example.com/api/requests');
+      expect(url).toContain('code=test-api-key-12345');
       expect(options.method).toBe('POST');
-      expect(options.headers['x-api-key']).toBe('test-api-key-12345');
+      // POST uses text/plain to avoid CORS preflight
+      expect(options.headers['Content-Type']).toBe('text/plain');
 
       const body = JSON.parse(options.body);
       expect(body.requesterEmail).toBe('user@test.com');
@@ -269,7 +273,8 @@ describe('API Client Integration', () => {
 
       const [url, options] = mockFetch.mock.calls[0];
 
-      expect(url).toBe('https://api.example.com/api/requests/request-123/approve');
+      expect(url).toContain('https://api.example.com/api/requests/request-123/approve');
+      expect(url).toContain('code=test-api-key-12345');
       expect(options.method).toBe('POST');
 
       const body = JSON.parse(options.body);
@@ -301,7 +306,8 @@ describe('API Client Integration', () => {
 
       const [url, options] = mockFetch.mock.calls[0];
 
-      expect(url).toBe('https://api.example.com/api/requests/request-123/reject');
+      expect(url).toContain('https://api.example.com/api/requests/request-123/reject');
+      expect(url).toContain('code=test-api-key-12345');
       expect(options.method).toBe('POST');
 
       const body = JSON.parse(options.body);
@@ -347,7 +353,7 @@ describe('API Client Integration', () => {
   });
 
   describe('API contract verification', () => {
-    it('should include all required headers for authenticated requests', async () => {
+    it('should send API key as query parameter to avoid CORS preflight', async () => {
       const client = createApiClient(apiConfig);
 
       mockFetch.mockResolvedValueOnce({
@@ -361,12 +367,12 @@ describe('API Client Integration', () => {
         view: 'month',
       });
 
-      const [, options] = mockFetch.mock.calls[0];
+      const [url, options] = mockFetch.mock.calls[0];
 
-      // Verify required headers per API contract
-      expect(options.headers).toHaveProperty('x-api-key');
-      // GET requests intentionally omit Content-Type to keep them as
-      // CORS "simple requests" and avoid triggering a preflight OPTIONS
+      // API key is in query string, not headers
+      expect(url).toContain('code=test-api-key-12345');
+      // No custom headers that would trigger CORS preflight
+      expect(options.headers['x-api-key']).toBeUndefined();
       expect(options.headers['Content-Type']).toBeUndefined();
     });
 

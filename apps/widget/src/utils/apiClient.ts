@@ -73,25 +73,36 @@ export function createApiClient(config: ApiClientConfig) {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${baseUrl.replace(/\/$/, '')}${endpoint}`;
+    let url = `${baseUrl.replace(/\/$/, '')}${endpoint}`;
+
+    // Append API key as query parameter (not header) to avoid CORS preflight
+    if (apiKey) {
+      const separator = url.includes('?') ? '&' : '?';
+      url += `${separator}code=${encodeURIComponent(apiKey)}`;
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    // Build headers - only include API key if provided.
-    // Only set Content-Type for requests with a body (POST, PUT, PATCH, DELETE).
-    // Omitting it on GET/HEAD keeps these as CORS "simple requests" which
-    // avoids triggering a preflight OPTIONS request that the Azure platform
-    // may intercept before our function code can handle it.
+    // Build headers - keep requests as CORS "simple requests" to avoid
+    // triggering preflight OPTIONS that the Azure platform CORS may
+    // intercept before our function code can handle it.
+    //
+    // CORS simple request rules:
+    //   - Methods: GET, HEAD, POST only
+    //   - Allowed Content-Types: text/plain, application/x-www-form-urlencoded, multipart/form-data
+    //   - No custom headers (x-api-key triggers preflight!)
+    //
+    // We use text/plain for POST bodies (backend parses JSON regardless)
+    // and omit Content-Type entirely for GET/HEAD.
     const method = (options.method || 'GET').toUpperCase();
     const needsContentType = options.body !== undefined || !['GET', 'HEAD'].includes(method);
     const headers: Record<string, string> = {
-      ...(needsContentType ? { 'Content-Type': 'application/json' } : {}),
+      ...(needsContentType ? { 'Content-Type': 'text/plain' } : {}),
       ...(options.headers as Record<string, string>),
     };
-    if (apiKey) {
-      headers['x-api-key'] = apiKey;
-    }
+    // API key is sent as a query parameter (not header) to avoid CORS preflight.
+    // Custom headers like x-api-key force the browser to send an OPTIONS preflight.
 
     try {
       const response = await fetch(url, {
