@@ -66,13 +66,23 @@ function formatDate(dateStr: string): string {
 }
 
 /**
- * Calculates the number of days in a date range.
+ * Calculates the number of business days (Mon–Fri) in a date range.
+ * Excludes weekends so email day counts match actual working days off.
+ * Uses UTC methods because YYYY-MM-DD strings are parsed as UTC midnight.
  */
 function getDayCount(startDate: string, endDate: string): number {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  const diffTime = Math.abs(end.getTime() - start.getTime());
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both days
+  let count = 0;
+  const current = new Date(start);
+  while (current <= end) {
+    const day = current.getUTCDay(); // 0=Sun, 6=Sat
+    if (day !== 0 && day !== 6) {
+      count++;
+    }
+    current.setUTCDate(current.getUTCDate() + 1);
+  }
+  return Math.max(count, 1); // At minimum 1 day
 }
 
 /**
