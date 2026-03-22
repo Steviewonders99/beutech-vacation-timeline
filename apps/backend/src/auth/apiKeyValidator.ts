@@ -15,7 +15,8 @@ import { logDiagnostic, DiagnosticCode } from '../utils/diagnostics';
  */
 const TRUSTED_ORIGINS = [
   'https://team.beautech.aero',
-  'https://beautech.staffbase.com',
+  'https://beautech-custom.staffbase.com',
+  'https://steviewonders99.github.io',
 ];
 
 /**

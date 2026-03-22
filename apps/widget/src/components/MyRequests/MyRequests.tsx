@@ -24,7 +24,7 @@ export interface MyRequestsProps {
   error: string | null;
   /** Refresh the requests */
   onRefresh: () => void;
-  /** Cancel a pending request */
+  /** Cancel a pending or approved request */
   onCancel?: (requestId: string) => Promise<void>;
   /** Whether a cancel action is in progress */
   isCancelling?: boolean;
@@ -77,14 +77,21 @@ function getLeaveTypeLabel(leaveType: string): string {
 }
 
 /**
- * Calculate the number of days between two dates (inclusive).
+ * Calculate the number of business days (Mon-Fri) between two dates (inclusive).
  */
 function calculateDays(startDate: string, endDate: string): number {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  const diffTime = Math.abs(end.getTime() - start.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays + 1; // Inclusive of both dates
+  let count = 0;
+  const current = new Date(start);
+  while (current <= end) {
+    const day = current.getUTCDay(); // 0=Sun, 6=Sat
+    if (day !== 0 && day !== 6) {
+      count++;
+    }
+    current.setUTCDate(current.getUTCDate() + 1);
+  }
+  return Math.max(count, 1); // At minimum 1 day
 }
 
 interface RequestCardProps {
@@ -99,10 +106,13 @@ interface RequestCardProps {
 const RequestCard: React.FC<RequestCardProps> = ({ request, onCancel, isCancelling }) => {
   const days = calculateDays(request.startDate, request.endDate);
   const daysLabel = days === 1 ? '1 day' : `${days} days`;
-  const canCancel = request.status === 'pending' && onCancel;
+  const canCancel = (request.status === 'pending' || request.status === 'approved') && onCancel;
 
   const handleCancel = async () => {
-    if (onCancel && window.confirm('Are you sure you want to cancel this request?')) {
+    const confirmMessage = request.status === 'approved'
+      ? 'Are you sure you want to cancel this approved request? The calendar event will also be removed.'
+      : 'Are you sure you want to cancel this request?';
+    if (onCancel && window.confirm(confirmMessage)) {
       try {
         await onCancel(request.id);
       } catch {

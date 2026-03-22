@@ -29,6 +29,8 @@ export interface UseMyRequestsOptions {
   status?: RequestStatus | 'all';
   /** Whether to skip fetching */
   skip?: boolean;
+  /** Callback invoked after a successful cancellation (e.g., to refresh calendar data) */
+  onCancelSuccess?: () => void;
 }
 
 export interface UseMyRequestsReturn {
@@ -40,7 +42,7 @@ export interface UseMyRequestsReturn {
   error: string | null;
   /** Refresh the requests */
   refresh: () => void;
-  /** Cancel a pending request */
+  /** Cancel a pending or approved request */
   cancelRequest: (requestId: string) => Promise<void>;
   /** Whether a cancel action is in progress */
   isCancelling: boolean;
@@ -61,7 +63,7 @@ export interface UseMyRequestsReturn {
  * ```
  */
 export function useMyRequests(options: UseMyRequestsOptions): UseMyRequestsReturn {
-  const { apiConfig, userEmail, status = 'all', skip = false } = options;
+  const { apiConfig, userEmail, status = 'all', skip = false, onCancelSuccess } = options;
 
   const [requests, setRequests] = useState<TimeOffRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -152,22 +154,19 @@ export function useMyRequests(options: UseMyRequestsOptions): UseMyRequestsRetur
         // Use mock behavior in development
         if (useMockData) {
           await new Promise((resolve) => setTimeout(resolve, 500));
-          // Update local state to show cancelled
-          setRequests((prev) =>
-            prev.map((r) =>
-              r.id === requestId ? { ...r, status: 'cancelled' as const } : r
-            )
-          );
+          // Remove cancelled request from the list
+          setRequests((prev) => prev.filter((r) => r.id !== requestId));
           return;
         }
 
         await apiClient.cancelTimeOffRequest(requestId, userEmail);
-        // Update local state to show cancelled
-        setRequests((prev) =>
-          prev.map((r) =>
-            r.id === requestId ? { ...r, status: 'cancelled' as const } : r
-          )
-        );
+        // Remove cancelled request from the list
+        setRequests((prev) => prev.filter((r) => r.id !== requestId));
+        // Brief delay before refreshing calendar data to allow Microsoft Graph
+        // to propagate the event deletion (eventual consistency).
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        // Notify parent to refresh calendar data (calendar event has been deleted)
+        onCancelSuccess?.();
       } catch (err) {
         const errorMessage =
           err instanceof ApiError
@@ -181,7 +180,7 @@ export function useMyRequests(options: UseMyRequestsOptions): UseMyRequestsRetur
         setIsCancelling(false);
       }
     },
-    [apiClient, userEmail, useMockData]
+    [apiClient, userEmail, useMockData, onCancelSuccess]
   );
 
   return {

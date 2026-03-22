@@ -3,7 +3,7 @@
  * Supports both shared calendar and per-user calendar modes.
  */
 
-import { graphGetWithParams, graphDelete } from './graphClient';
+import { graphGetWithParams, graphPost, graphDelete } from './graphClient';
 import { getConfig } from '../utils/env';
 import { Logger } from '../utils/logger';
 import {
@@ -288,8 +288,10 @@ export async function getVacations(
 
 
 /**
- * Deletes a calendar event from the shared calendar.
- * 
+ * Cancels and deletes a calendar event from the shared calendar.
+ * First sends a cancellation notice to attendees (removes from their Outlook),
+ * then deletes the event from the shared calendar.
+ *
  * @param eventId - The Graph API event ID
  * @param logger - Optional logger
  */
@@ -307,14 +309,33 @@ export async function deleteCalendarEvent(
     );
   }
 
-  logger?.info("Deleting calendar event", {
+  logger?.info("Cancelling and deleting calendar event", {
     eventId,
     mailbox: config.vacationCalendarMailbox,
   });
 
-  const endpoint = `/users/${encodeURIComponent(config.vacationCalendarMailbox)}/calendar/events/${encodeURIComponent(eventId)}`;
+  const eventPath = `/users/${encodeURIComponent(config.vacationCalendarMailbox)}/calendar/events/${encodeURIComponent(eventId)}`;
 
-  await graphDelete(endpoint, logger);
+  // Step 1: Cancel the event — sends cancellation notices to all attendees,
+  // which removes the event from their personal Outlook calendars.
+  try {
+    await graphPost(
+      `${eventPath}/cancel`,
+      { Comment: "This time-off request has been cancelled." },
+      logger
+    );
+    logger?.info("Cancellation notice sent to attendees", { eventId });
+  } catch (cancelError) {
+    // Log but continue to deletion — the event may have no attendees
+    // or already been removed from attendee calendars.
+    logger?.warn("Failed to send cancellation notice (continuing to delete)", {
+      eventId,
+      error: cancelError instanceof Error ? cancelError.message : String(cancelError),
+    });
+  }
+
+  // Step 2: Delete the event from the shared calendar.
+  await graphDelete(eventPath, logger);
 
   logger?.info("Calendar event deleted successfully", { eventId });
 }
