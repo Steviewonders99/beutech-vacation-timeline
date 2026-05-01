@@ -117,7 +117,12 @@ export function useMyRequests(options: UseMyRequestsOptions): UseMyRequestsRetur
       });
 
       if (currentRequestId === requestIdRef.current) {
-        setRequests(response.requests);
+        // Filter out cancelled requests — they clutter the list and
+        // serve no actionable purpose for the requester.
+        const activeRequests = response.requests.filter(
+          (r: TimeOffRequest) => r.status !== 'cancelled'
+        );
+        setRequests(activeRequests);
       }
     } catch (err) {
       if (currentRequestId === requestIdRef.current) {

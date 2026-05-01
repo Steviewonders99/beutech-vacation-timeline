@@ -12,7 +12,7 @@
       "value": true
     },
     "allowedOrigins": {
-      "value": "https://beautech.staffbase.com,https://team.beautech.aero,https://app.staffbase.com"
+      "value": "https://beautech-custom.staffbase.com,https://team.beautech.aero"
     },
     "postgresSkuTier": {
       "value": "Burstable"

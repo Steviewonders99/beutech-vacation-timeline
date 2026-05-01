@@ -35,6 +35,7 @@ export interface AppConfig {
 
   // Auto-approve
   autoApproveEmails: string[];
+  autoApproveDepartments: string[];
 
   // Settings
   maxDateRangeDays: number;
@@ -152,6 +153,7 @@ export function loadConfig(): AppConfig {
 
     // Auto-approve (lowercased for case-insensitive comparison)
     autoApproveEmails: getListEnv('AUTO_APPROVE_EMAILS').map((e) => e.toLowerCase()),
+    autoApproveDepartments: getListEnv('AUTO_APPROVE_DEPARTMENTS', ['Technical']).map((d) => d.toLowerCase()),
 
     // Settings
     maxDateRangeDays: getIntEnv('MAX_DATE_RANGE_DAYS', Defaults.MAX_DATE_RANGE_DAYS),

@@ -76,7 +76,7 @@ export async function getManager(
     // Check if it's a "no manager" error (404 or specific error code)
     const errorMessage = error instanceof Error ? error.message : String(error);
 
-    if (errorMessage.includes('404') || errorMessage.includes('Resource not found')) {
+    if (errorMessage.includes('404') || errorMessage.includes('Resource not found') || errorMessage.includes('does not exist')) {
       throw new ApiError(
         ErrorCodes.NotFound,
         `No manager found for user ${userEmail}. Please ensure the user has a manager assigned in Azure AD.`,
@@ -102,17 +102,18 @@ export async function getManager(
 export async function getUserInfo(
   userEmail: string,
   logger?: Logger
-): Promise<{ id: string; email: string; displayName: string }> {
+): Promise<{ id: string; email: string; displayName: string; department?: string }> {
   logger?.debug('Getting user info', { userEmail });
 
   try {
-    const endpoint = `/users/${encodeURIComponent(userEmail)}`;
+    const endpoint = `/users/${encodeURIComponent(userEmail)}?$select=id,mail,userPrincipalName,displayName,department`;
 
     interface GraphUserResponse {
       id: string;
       mail?: string;
       userPrincipalName: string;
       displayName: string;
+      department?: string;
     }
 
     const response = await graphGet<GraphUserResponse>(endpoint, logger);
@@ -121,6 +122,7 @@ export async function getUserInfo(
       id: response.id,
       email: response.mail || response.userPrincipalName,
       displayName: response.displayName,
+      department: response.department,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

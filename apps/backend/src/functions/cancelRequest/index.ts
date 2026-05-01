@@ -2,7 +2,8 @@
  * Azure Function: POST /api/requests/{id}/cancel
  *
  * Cancels a time-off request (by the requester).
- * Only pending requests can be cancelled.
+ * Pending and approved requests can be cancelled.
+ * If the request was approved, the associated Outlook calendar event is also deleted.
  * Only the requester can cancel their own requests.
  * Requires x-api-key header for authentication.
  */

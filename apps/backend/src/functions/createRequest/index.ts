@@ -126,7 +126,7 @@ async function createRequestHandler(
 
 // Register the function
 app.http('createRequest', {
-  methods: ['POST', 'OPTIONS'],
+  methods: ['POST'],
   authLevel: 'anonymous',
   route: 'requests',
   handler: createRequestHandler,
