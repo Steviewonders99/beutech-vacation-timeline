@@ -158,7 +158,7 @@ function generateNewRequestEmailHtml(
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 20px;">
         <tr>
           <td style="padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-            <p style="margin: 0;"><strong>Action Required:</strong> Please review and approve or reject this request in the Vacation Timeline widget.</p>
+            <p style="margin: 0;"><strong>Action Required:</strong> Please review and approve or reject this request in the Leave Request Timeline widget.</p>
           </td>
         </tr>
       </table>
@@ -274,7 +274,7 @@ function generateNewRequestEmailHtml(
           <tr>
             <td style="padding: 20px 30px; background-color: #f9fafb; border-top: 1px solid #e5e5e5;">
               <p style="margin: 0; font-size: 12px; color: #888888; text-align: center;">
-                This is an automated message from the Beutech Vacation Timeline system.
+                This is an automated message from the Beutech Leave Request Timeline system.
               </p>
             </td>
           </tr>
@@ -333,11 +333,11 @@ function generateApprovalEmailHtml(request: TimeOffRequest): string {
       </div>
 
       <div class="success-box">
-        <p style="margin: 0;"><strong>Calendar Event Created:</strong> This time off has been added to the vacation calendar.</p>
+        <p style="margin: 0;"><strong>Calendar Event Created:</strong> This time off has been added to the leave request calendar.</p>
       </div>
 
       <div class="footer">
-        <p>This is an automated message from the Beutech Vacation Timeline system.</p>
+        <p>This is an automated message from the Beutech Leave Request Timeline system.</p>
       </div>
     </div>
   </div>
@@ -393,7 +393,7 @@ function generateRejectionEmailHtml(request: TimeOffRequest): string {
       <p>Please contact your supervisor if you have questions or would like to discuss alternative dates.</p>
 
       <div class="footer">
-        <p>This is an automated message from the Beutech Vacation Timeline system.</p>
+        <p>This is an automated message from the Beutech Leave Request Timeline system.</p>
       </div>
     </div>
   </div>
@@ -496,7 +496,7 @@ export async function sendTeamsNotification(
   const payload: TeamsActivityPayload = {
     topic: {
       source: 'text',
-      value: 'Vacation Timeline',
+      value: 'Leave Request Timeline',
     },
     activityType: 'taskCreated',
     previewText: {
@@ -554,7 +554,7 @@ export async function sendTeamsAdaptiveCard(
     if (actionUrls) {
       teamsMessage += `\n\nApprove: ${actionUrls.approveUrl}\nDecline: ${actionUrls.rejectUrl}`;
     } else {
-      teamsMessage += ' Please review and approve or reject in the Vacation Timeline widget.';
+      teamsMessage += ' Please review and approve or reject in the Leave Request Timeline widget.';
     }
 
     await sendTeamsNotification(userId, 'New Time-Off Request', teamsMessage, logger);

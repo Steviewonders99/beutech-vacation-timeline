@@ -15,7 +15,7 @@ import { UiSchema } from "@rjsf/utils";
 import { JSONSchema7 } from "json-schema";
 
 /**
- * Configuration schema for the Vacation Timeline widget.
+ * Configuration schema for the Leave Request Timeline widget.
  * These settings are configured by admins in Staffbase Studio.
  * @see https://rjsf-team.github.io/react-jsonschema-form/docs/
  */
@@ -77,14 +77,14 @@ export const configurationSchema: JSONSchema7 = {
     sharedCalendarMailbox: {
       type: "string",
       title: "📧 Shared Calendar Email",
-      description: "Email address of your team's shared vacation calendar",
+      description: "Email address of your team's shared leave request calendar",
       format: "email",
     },
     vacationCategory: {
       type: "string",
       title: "🏷️ Calendar Category",
-      description: "The label used for vacation events in Outlook",
-      default: "Vacation",
+      description: "The label used for leave request events in Outlook",
+      default: "Leave Request",
     },
 
     // ============================================
@@ -181,7 +181,7 @@ export const uiSchema: UiSchema = {
     "ui:help": "Only needed if using 'Shared Calendar' mode above",
   },
   vacationCategory: {
-    "ui:placeholder": "Vacation",
+    "ui:placeholder": "Leave Request",
     "ui:help": "Only needed if using 'Individual Calendars' mode",
   },
   m365FallbackDomain: {

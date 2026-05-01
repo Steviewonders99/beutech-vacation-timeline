@@ -38,7 +38,7 @@ export interface RequestModalProps {
 }
 
 const LEAVE_TYPE_OPTIONS: { value: LeaveType; label: string }[] = [
-  { value: 'vacation', label: 'Vacation' },
+  { value: 'vacation', label: 'Time Off' },
   { value: 'sick', label: 'Sick Leave' },
   { value: 'personal', label: 'Personal Day' },
   { value: 'other', label: 'Other' },

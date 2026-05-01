@@ -35,7 +35,7 @@ describe('vacationService', () => {
       mockGetConfig.mockReturnValue({
         calendarMode: 'shared',
         vacationCalendarMailbox: 'vacations@test.com',
-        vacationCategory: 'Vacation',
+        vacationCategory: 'Leave Request',
         defaultTimezone: 'UTC',
         tenantId: 'test',
         clientId: 'test',
@@ -52,7 +52,7 @@ describe('vacationService', () => {
         value: [
           {
             id: 'event-1',
-            subject: 'John - Vacation',
+            subject: 'John - Time Off',
             start: { dateTime: '2025-01-10T00:00:00', timeZone: 'UTC' },
             end: { dateTime: '2025-01-15T00:00:00', timeZone: 'UTC' },
             isAllDay: true,
@@ -62,7 +62,7 @@ describe('vacationService', () => {
                 address: 'john@test.com',
               },
             },
-            categories: ['Vacation'],
+            categories: ['Leave Request'],
           },
           {
             id: 'event-2',
@@ -98,25 +98,25 @@ describe('vacationService', () => {
         value: [
           {
             id: 'event-1',
-            subject: 'John - Vacation',
+            subject: 'John - Time Off',
             start: { dateTime: '2025-01-10T00:00:00', timeZone: 'UTC' },
             end: { dateTime: '2025-01-15T00:00:00', timeZone: 'UTC' },
             isAllDay: true,
             organizer: {
               emailAddress: { name: 'John Doe', address: 'john@test.com' },
             },
-            categories: ['Vacation'],
+            categories: ['Leave Request'],
           },
           {
             id: 'event-2',
-            subject: 'Jane - Vacation',
+            subject: 'Jane - Time Off',
             start: { dateTime: '2025-01-20T00:00:00', timeZone: 'UTC' },
             end: { dateTime: '2025-01-21T00:00:00', timeZone: 'UTC' },
             isAllDay: true,
             organizer: {
               emailAddress: { name: 'Jane Smith', address: 'jane@test.com' },
             },
-            categories: ['Vacation'],
+            categories: ['Leave Request'],
           },
         ],
       });
@@ -134,7 +134,7 @@ describe('vacationService', () => {
       mockGetConfig.mockReturnValue({
         calendarMode: 'shared',
         vacationCalendarMailbox: undefined,
-        vacationCategory: 'Vacation',
+        vacationCategory: 'Leave Request',
         defaultTimezone: 'UTC',
         tenantId: 'test',
         clientId: 'test',
@@ -193,7 +193,7 @@ describe('vacationService', () => {
     beforeEach(() => {
       mockGetConfig.mockReturnValue({
         calendarMode: 'perUser',
-        vacationCategory: 'Vacation',
+        vacationCategory: 'Leave Request',
         defaultTimezone: 'UTC',
         tenantId: 'test',
         clientId: 'test',
@@ -211,11 +211,11 @@ describe('vacationService', () => {
           value: [
             {
               id: 'event-1',
-              subject: 'John Vacation',
+              subject: 'John Time Off',
               start: { dateTime: '2025-01-10T00:00:00', timeZone: 'UTC' },
               end: { dateTime: '2025-01-15T00:00:00', timeZone: 'UTC' },
               isAllDay: true,
-              categories: ['Vacation'],
+              categories: ['Leave Request'],
             },
           ],
         })
@@ -223,11 +223,11 @@ describe('vacationService', () => {
           value: [
             {
               id: 'event-2',
-              subject: 'Jane Vacation',
+              subject: 'Jane Time Off',
               start: { dateTime: '2025-01-20T00:00:00', timeZone: 'UTC' },
               end: { dateTime: '2025-01-22T00:00:00', timeZone: 'UTC' },
               isAllDay: true,
-              categories: ['Vacation'],
+              categories: ['Leave Request'],
             },
           ],
         });
@@ -259,11 +259,11 @@ describe('vacationService', () => {
           value: [
             {
               id: 'event-1',
-              subject: 'John Vacation',
+              subject: 'John Time Off',
               start: { dateTime: '2025-01-10T00:00:00', timeZone: 'UTC' },
               end: { dateTime: '2025-01-15T00:00:00', timeZone: 'UTC' },
               isAllDay: true,
-              categories: ['Vacation'],
+              categories: ['Leave Request'],
             },
           ],
         })

@@ -31,7 +31,7 @@ const mockConfig = {
   clientSecret: 'test-secret',
   calendarMode: 'shared',
   vacationCalendarMailbox: 'vacations@test.com',
-  vacationCategory: 'Vacation',
+  vacationCategory: 'Leave Request',
   defaultTimezone: 'UTC',
   apiKey: 'test-key',
   allowedOrigins: ['https://test.staffbase.com'],

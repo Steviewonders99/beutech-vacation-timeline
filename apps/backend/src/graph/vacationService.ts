@@ -81,13 +81,13 @@ async function getVacationsFromSharedCalendar(
 
     // Transform to VacationEvent format
     // For shared calendar, extract user info from the event subject
-    // Subject format: "Name - Vacation", "Name - PTO", "Name - Time Off", etc.
+    // Subject format: "Name - Time Off", "Name - PTO", "Name - Leave", etc.
     const events = response.value.map((event) => {
       let userName = 'Unknown';
       let userEmail = event.organizer?.emailAddress?.address || 'unknown';
 
       // Parse the subject to extract the person's name
-      // Common patterns: "Name - Vacation", "Name - PTO", "Name - Time Off"
+      // Common patterns: "Name - Time Off", "Name - PTO", "Name - Leave"
       // Require spaces around the dash to avoid splitting hyphenated names
       // like "Philip Hix-Coquet" at the inner hyphen.
       if (event.subject) {

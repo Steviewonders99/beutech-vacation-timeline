@@ -32,7 +32,7 @@ export interface VacationEvent {
   userDisplayName: string;
   /** Consistent color key for this user (used with colorUtils) */
   userColorKey: string;
-  /** Event title (usually "Vacation" or similar) */
+  /** Event title (usually "Time Off" or similar) */
   title: string;
   /** Start date/time in ISO 8601 format */
   start: string;

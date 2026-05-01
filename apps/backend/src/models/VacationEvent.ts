@@ -15,7 +15,7 @@ export interface VacationEvent {
   userDisplayName: string;
   /** Consistent color key for this user (typically email) */
   userColorKey: string;
-  /** Event title (usually "Vacation" or similar) */
+  /** Event title (usually "Time Off" or similar) */
   title: string;
   /** Start date/time in ISO 8601 format */
   start: string;
@@ -103,19 +103,32 @@ export interface GraphCalendarEvent {
 
 /**
  * Transforms a Graph calendar event to our VacationEvent format.
+ *
+ * For all-day events, Microsoft Graph uses an **exclusive** end date
+ * (e.g. Mon-Fri vacation → end = Sat T00:00:00). We subtract one day
+ * so the frontend receives the **inclusive** last day of the event.
  */
 export function toVacationEvent(
   graphEvent: GraphCalendarEvent,
   userId: string,
   userDisplayName: string
 ): VacationEvent {
+  let endDateTime = graphEvent.end.dateTime;
+
+  if (graphEvent.isAllDay) {
+    const endDate = new Date(endDateTime);
+    endDate.setDate(endDate.getDate() - 1);
+    // Keep the same T00:00:00 format but on the correct (inclusive) last day
+    endDateTime = endDate.toISOString().split('T')[0] + 'T23:59:59';
+  }
+
   return {
     id: graphEvent.id,
     userId,
     userDisplayName,
     userColorKey: userId.toLowerCase(),
-    title: graphEvent.subject || 'Vacation',
+    title: graphEvent.subject || 'Time Off',
     start: graphEvent.start.dateTime,
-    end: graphEvent.end.dateTime,
+    end: endDateTime,
   };
 }

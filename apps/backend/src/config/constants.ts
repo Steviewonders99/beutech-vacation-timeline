@@ -22,8 +22,8 @@ export const Defaults = {
   MAX_DATE_RANGE_DAYS: 90,
   /** Default calendar mode */
   CALENDAR_MODE: 'shared' as const,
-  /** Default vacation category name */
-  VACATION_CATEGORY: 'Vacation',
+  /** Default leave request category name */
+  VACATION_CATEGORY: 'Leave Request',
   /** Default log level */
   LOG_LEVEL: 'info' as const,
 } as const;

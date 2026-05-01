@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Log error to console in development
-    console.error('VacationTimeline Error:', error);
+    console.error('LeaveRequestTimeline Error:', error);
     console.error('Component Stack:', errorInfo.componentStack);
   }
 
@@ -118,7 +118,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           </svg>
           <h2 className="vt-error-boundary__title">Something went wrong</h2>
           <p className="vt-error-boundary__message">
-            The Vacation Timeline widget encountered an unexpected error.
+            The Leave Timeline widget encountered an unexpected error.
             Please try refreshing or contact support if the problem persists.
           </p>
           <button

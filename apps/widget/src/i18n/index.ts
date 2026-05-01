@@ -1,5 +1,5 @@
 /**
- * i18n Configuration for Vacation Timeline Widget
+ * i18n Configuration for Leave Request Timeline Widget
  * Auto-detects language from Staffbase contentLanguage prop
  */
 

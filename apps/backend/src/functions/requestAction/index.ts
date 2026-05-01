@@ -42,7 +42,7 @@ function generateHtmlResponse(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} - Vacation Timeline</title>
+  <title>${title} - Leave Request Timeline</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -114,7 +114,7 @@ function generateHtmlResponse(
       ${details ? `<div class="details">${details}</div>` : ''}
     </div>
     <div class="footer">
-      Beutech Vacation Timeline
+      Beutech Leave Request Timeline
     </div>
   </div>
 </body>
@@ -149,7 +149,7 @@ function generateRejectFormHtml(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Decline Request - Vacation Timeline</title>
+  <title>Decline Request - Leave Request Timeline</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -282,7 +282,7 @@ function generateRejectFormHtml(
       <div class="request-info">
         <p><strong>Employee:</strong> ${request.requesterName}</p>
         <p><strong>Dates:</strong> ${formatDate(request.startDate)} - ${formatDate(request.endDate)}</p>
-        <p><strong>Type:</strong> ${request.leaveType.charAt(0).toUpperCase() + request.leaveType.slice(1)}</p>
+        <p><strong>Type:</strong> ${request.leaveType === 'vacation' ? 'Time Off' : request.leaveType === 'sick' ? 'Sick Leave' : request.leaveType === 'personal' ? 'Personal Day' : request.leaveType === 'other' ? 'Other' : request.leaveType.charAt(0).toUpperCase() + request.leaveType.slice(1)}</p>
       </div>
 
       ${error ? `<div class="error-message">${error}</div>` : ''}
@@ -305,7 +305,7 @@ function generateRejectFormHtml(
       </form>
     </div>
     <div class="footer">
-      Beutech Vacation Timeline
+      Beutech Leave Request Timeline
     </div>
   </div>
 </body>
@@ -380,7 +380,7 @@ async function requestActionHandler(
           'Invalid or Expired Link',
           'This action link is no longer valid.',
           errorMessage === 'Token has expired'
-            ? 'Action links expire after 24 hours. Please approve or reject the request from the Vacation Timeline widget.'
+            ? 'Action links expire after 24 hours. Please approve or reject the request from the Leave Request Timeline widget.'
             : 'The link may have been corrupted. Please try again from the original email.'
         ),
       };
@@ -547,7 +547,7 @@ async function requestActionHandler(
           false,
           'Action Failed',
           error.message,
-          'Please try again or use the Vacation Timeline widget to manage this request.'
+          'Please try again or use the Leave Request Timeline widget to manage this request.'
         ),
       };
     }
@@ -559,7 +559,7 @@ async function requestActionHandler(
         false,
         'Something Went Wrong',
         'An unexpected error occurred while processing your request.',
-        'Please try again later or use the Vacation Timeline widget.'
+        'Please try again later or use the Leave Request Timeline widget.'
       ),
     };
   }

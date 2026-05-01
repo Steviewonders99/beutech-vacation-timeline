@@ -76,7 +76,7 @@ const factory: BlockFactory = (BaseBlockClass, widgetApi: WidgetApi) => {
         <ErrorBoundary
           onError={(error, errorInfo) => {
             // Log to console for debugging
-            console.error('Vacation Timeline Error:', error.message);
+            console.error('Leave Request Timeline Error:', error.message);
             console.error('Stack:', errorInfo.componentStack);
           }}
         >
@@ -103,7 +103,7 @@ const factory: BlockFactory = (BaseBlockClass, widgetApi: WidgetApi) => {
         this._root.render(
           <ErrorBoundary
             onError={(error, errorInfo) => {
-              console.error('Vacation Timeline Error:', error.message);
+              console.error('Leave Request Timeline Error:', error.message);
               console.error('Stack:', errorInfo.componentStack);
             }}
           >
@@ -125,7 +125,7 @@ const blockDefinition: BlockDefinition = {
   blockLevel: 'block',
   configurationSchema: configurationSchema,
   uiSchema: uiSchema,
-  label: 'Vacation Timeline',
+  label: 'Leave Request Timeline',
   iconUrl: icon
 };
 

@@ -35,15 +35,15 @@ const MOCK_EMPLOYEES = [
 ];
 
 /**
- * Vacation titles for variety.
+ * Leave request titles for variety.
  */
 const VACATION_TITLES = [
-  'Vacation',
+  'Time Off',
   'PTO',
   'Annual Leave',
   'Holiday',
-  'Time Off',
-  'Family Vacation',
+  'Leave',
+  'Family Leave',
   'Personal Day',
 ];
 
@@ -137,7 +137,7 @@ export function getStaticMockVacations(): VacationEvent[] {
       userId: 'sarah.johnson@beautech.com',
       userDisplayName: 'Sarah Johnson',
       userColorKey: 'sarah.johnson@beautech.com',
-      title: 'Summer Vacation',
+      title: 'Summer Leave',
       start: addDays(weekStart, 1).toISOString(),
       end: addDays(weekStart, 8).toISOString(),
     },
@@ -197,7 +197,7 @@ export function getStaticMockVacations(): VacationEvent[] {
       userId: 'sophia.martinez@beautech.com',
       userDisplayName: 'Sophia Martinez',
       userColorKey: 'sophia.martinez@beautech.com',
-      title: 'Vacation',
+      title: 'Time Off',
       start: addDays(weekStart, 10).toISOString(),
       end: addDays(weekStart, 14).toISOString(),
     },

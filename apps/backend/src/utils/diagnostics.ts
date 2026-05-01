@@ -49,7 +49,7 @@ export const DiagnosticMessages: Record<DiagnosticCode, {
   [DiagnosticCode.MISSING_CALENDAR_MAILBOX]: {
     title: 'Shared Calendar Mailbox Not Configured',
     description: 'CALENDAR_MODE is "shared" but VACATION_CALENDAR_MAILBOX is not set or the mailbox does not exist.',
-    remediation: 'Set VACATION_CALENDAR_MAILBOX to a valid shared mailbox email, e.g., "vacation-calendar@yourcompany.com"',
+    remediation: 'Set VACATION_CALENDAR_MAILBOX to a valid shared mailbox email, e.g., "leave-calendar@yourcompany.com"',
     docLink: 'docs/KNOWN-ISSUES-AND-PITFALLS.md#2-missing-or-incorrect-shared_calendar_mailbox',
   },
   [DiagnosticCode.GRAPH_PERMISSION_DENIED]: {
@@ -114,8 +114,8 @@ export const DiagnosticMessages: Record<DiagnosticCode, {
   },
   [DiagnosticCode.CALENDAR_EVENTS_MISSING]: {
     title: 'Calendar Events Not Found',
-    description: 'No vacation events returned for the requested date range.',
-    remediation: 'Check: 1) Events exist in the calendar, 2) Events have the vacation category, 3) User email matches M365 UPN.',
+    description: 'No leave request events returned for the requested date range.',
+    remediation: 'Check: 1) Events exist in the calendar, 2) Events have the leave request category, 3) User email matches M365 UPN.',
     docLink: 'docs/KNOWN-ISSUES-AND-PITFALLS.md#13-calendar-events-not-showing-for-some-users',
   },
   [DiagnosticCode.MANAGER_NOT_DETECTED]: {

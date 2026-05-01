@@ -64,7 +64,7 @@ function getStatusClass(status: RequestStatus): string {
 function getLeaveTypeLabel(leaveType: string): string {
   switch (leaveType) {
     case 'vacation':
-      return 'Vacation';
+      return 'Time Off';
     case 'sick':
       return 'Sick Leave';
     case 'personal':

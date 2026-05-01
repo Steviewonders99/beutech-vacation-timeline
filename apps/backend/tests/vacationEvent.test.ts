@@ -17,7 +17,7 @@ describe('toVacationEvent', () => {
       timeZone: 'UTC',
     },
     isAllDay: true,
-    categories: ['Vacation'],
+    categories: ['Leave Request'],
   };
 
   it('should transform Graph event to VacationEvent', () => {
@@ -30,7 +30,7 @@ describe('toVacationEvent', () => {
       userColorKey: 'john@example.com',
       title: 'Annual Leave',
       start: '2025-05-01T00:00:00',
-      end: '2025-05-05T00:00:00',
+      end: '2025-05-04T23:59:59', // All-day: exclusive end (May 5) adjusted to inclusive (May 4)
     });
   });
 
@@ -40,7 +40,7 @@ describe('toVacationEvent', () => {
     expect(result.userColorKey).toBe('john.doe@example.com');
   });
 
-  it('should default to "Vacation" title when subject is empty', () => {
+  it('should default to "Time Off" title when subject is empty', () => {
     const eventWithoutSubject: GraphCalendarEvent = {
       ...mockGraphEvent,
       subject: '',
@@ -48,12 +48,13 @@ describe('toVacationEvent', () => {
 
     const result = toVacationEvent(eventWithoutSubject, 'user@example.com', 'User');
 
-    expect(result.title).toBe('Vacation');
+    expect(result.title).toBe('Time Off');
   });
 
   it('should preserve start and end date times', () => {
     const eventWithTimes: GraphCalendarEvent = {
       ...mockGraphEvent,
+      isAllDay: false,
       start: {
         dateTime: '2025-06-15T09:00:00',
         timeZone: 'America/New_York',
@@ -78,7 +79,7 @@ describe('toVacationEvent', () => {
         start: { dateTime: '2025-01-01T00:00:00', timeZone: 'UTC' },
         end: { dateTime: '2025-01-02T00:00:00', timeZone: 'UTC' },
         isAllDay: true,
-        categories: ['Vacation', 'Personal'],
+        categories: ['Leave Request', 'Personal'],
         organizer: {
           emailAddress: {
             name: 'Jane Smith',
@@ -100,6 +101,8 @@ describe('toVacationEvent', () => {
 
       expect(result.id).toBe('full-event-1');
       expect(result.title).toBe('PTO');
+      // All-day: exclusive end (Jan 2) adjusted to inclusive (Jan 1)
+      expect(result.end).toBe('2025-01-01T23:59:59');
     });
 
     it('should handle minimal event', () => {
@@ -115,18 +118,18 @@ describe('toVacationEvent', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe('min-1');
-      expect(result.title).toBe('Vacation');
+      expect(result.title).toBe('Time Off');
     });
 
     it('should handle special characters in subject', () => {
       const eventWithSpecialChars: GraphCalendarEvent = {
         ...mockGraphEvent,
-        subject: "John's Vacation & Family Time 🏖️",
+        subject: "John's Leave & Family Time 🏖️",
       };
 
       const result = toVacationEvent(eventWithSpecialChars, 'john@example.com', 'John');
 
-      expect(result.title).toBe("John's Vacation & Family Time 🏖️");
+      expect(result.title).toBe("John's Leave & Family Time 🏖️");
     });
 
     it('should handle very long display names', () => {
@@ -145,7 +148,7 @@ describe('VacationEvent interface', () => {
       userId: 'user@test.com',
       userDisplayName: 'Test User',
       userColorKey: 'user@test.com',
-      title: 'Vacation',
+      title: 'Time Off',
       start: '2025-01-01T00:00:00Z',
       end: '2025-01-05T00:00:00Z',
     };
@@ -154,7 +157,7 @@ describe('VacationEvent interface', () => {
     expect(event.userId).toBe('user@test.com');
     expect(event.userDisplayName).toBe('Test User');
     expect(event.userColorKey).toBe('user@test.com');
-    expect(event.title).toBe('Vacation');
+    expect(event.title).toBe('Time Off');
     expect(event.start).toBe('2025-01-01T00:00:00Z');
     expect(event.end).toBe('2025-01-05T00:00:00Z');
   });

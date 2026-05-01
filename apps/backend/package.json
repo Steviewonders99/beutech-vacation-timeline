@@ -2,7 +2,7 @@
   "name": "@beutech/vacation-timeline-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Azure Functions backend for Vacation Timeline Widget",
+  "description": "Azure Functions backend for Leave Request Timeline Widget",
   "main": "dist/src/functions/*/index.js",
   "scripts": {
     "build": "tsc",

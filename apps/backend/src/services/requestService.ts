@@ -21,6 +21,25 @@ import {
   notifyRequesterOfApproval,
   notifyRequesterOfRejection,
 } from './notificationService';
+import { deleteCalendarEvent } from '../graph/vacationService';
+
+/**
+ * Maps leave type values to human-readable labels for calendar events.
+ */
+function getLeaveTypeLabel(leaveType: string): string {
+  switch (leaveType) {
+    case 'vacation':
+      return 'Time Off';
+    case 'sick':
+      return 'Sick Leave';
+    case 'personal':
+      return 'Personal Day';
+    case 'other':
+      return 'Other';
+    default:
+      return leaveType.charAt(0).toUpperCase() + leaveType.slice(1);
+  }
+}
 
 /**
  * Validates date format (YYYY-MM-DD).
@@ -94,15 +113,24 @@ export async function createRequest(
     const requesterInfo = await getUserInfo(input.requesterEmail, logger);
     logger?.debug('Got requester info', { requesterId: requesterInfo.id });
 
-    // Check if requester is in the auto-approve list (e.g. CEO, executives)
+    // Check if requester qualifies for auto-approve:
+    // 1. Email is in the auto-approve list (e.g. CEO, executives)
+    // 2. Department is in the auto-approve departments list (e.g. Technical)
     const config = getConfig();
-    const isAutoApprove = config.autoApproveEmails.includes(
+    const isAutoApproveEmail = config.autoApproveEmails.includes(
       input.requesterEmail.toLowerCase()
     );
+    const isAutoApproveDepartment = !!(
+      requesterInfo.department &&
+      config.autoApproveDepartments.includes(requesterInfo.department.toLowerCase())
+    );
+    const isAutoApprove = isAutoApproveEmail || isAutoApproveDepartment;
 
     if (isAutoApprove) {
-      logger?.info('Auto-approving request for executive', {
+      const autoApproveReason = isAutoApproveEmail ? 'executive' : `department:${requesterInfo.department}`;
+      logger?.info('Auto-approving request', {
         requesterEmail: input.requesterEmail,
+        reason: autoApproveReason,
       });
 
       // Insert as approved, supervisor = self (no manager lookup needed)
@@ -132,7 +160,7 @@ export async function createRequest(
         input.endDate,
         input.leaveType || 'vacation',
         input.reason || null,
-        input.requesterEmail,   // status_changed_by
+        isAutoApproveEmail ? input.requesterEmail : `system:auto-dept:${requesterInfo.department}`,   // status_changed_by
       ];
 
       const autoRows = await query<TimeOffRequestRow>(autoSql, autoParams, logger);
@@ -182,11 +210,98 @@ export async function createRequest(
     }
 
     // Standard flow: get manager and create pending request
-    const manager = await getManager(input.requesterEmail, logger);
-    logger?.debug('Got manager info', {
-      managerEmail: manager.email,
-      managerId: manager.id,
-    });
+    let manager: Awaited<ReturnType<typeof getManager>> | null = null;
+    try {
+      manager = await getManager(input.requesterEmail, logger);
+      logger?.debug('Got manager info', {
+        managerEmail: manager.email,
+        managerId: manager.id,
+      });
+    } catch (managerError) {
+      // If no manager found, auto-approve the request
+      if (managerError instanceof ApiError && managerError.statusCode === 404) {
+        logger?.info('No manager found, auto-approving request', {
+          requesterEmail: input.requesterEmail,
+        });
+
+        const noMgrSql = `
+          INSERT INTO time_off_requests (
+            requester_email, requester_name, requester_id,
+            supervisor_email, supervisor_name, supervisor_id,
+            start_date, end_date, leave_type, reason,
+            status, status_changed_at, status_changed_by
+          ) VALUES (
+            $1, $2, $3,
+            $4, $5, $6,
+            $7, $8, $9, $10,
+            'approved', NOW(), $11
+          )
+          RETURNING *
+        `;
+
+        const noMgrParams = [
+          input.requesterEmail,
+          input.requesterName,
+          requesterInfo.id,
+          input.requesterEmail,   // supervisor = self (no manager)
+          input.requesterName,    // supervisor name = self
+          requesterInfo.id,       // supervisor id = self
+          input.startDate,
+          input.endDate,
+          input.leaveType || 'vacation',
+          input.reason || null,
+          'system:no-manager',    // status_changed_by
+        ];
+
+        const noMgrRows = await query<TimeOffRequestRow>(noMgrSql, noMgrParams, logger);
+
+        if (noMgrRows.length === 0) {
+          throw new Error('Insert did not return a row');
+        }
+
+        let noMgrRequest = toTimeOffRequest(noMgrRows[0]);
+
+        // Create calendar event
+        const calendarEventId = await createCalendarEvent(noMgrRequest, logger);
+
+        const updateSql = `
+          UPDATE time_off_requests
+          SET calendar_event_id = $2, updated_at = NOW()
+          WHERE id = $1
+          RETURNING *
+        `;
+
+        const updatedRows = await query<TimeOffRequestRow>(
+          updateSql,
+          [noMgrRequest.id, calendarEventId],
+          logger
+        );
+
+        if (updatedRows.length > 0) {
+          noMgrRequest = toTimeOffRequest(updatedRows[0]);
+        }
+
+        // Notify requester of auto-approval
+        const senderEmail = config.vacationCalendarMailbox || input.requesterEmail;
+        notifyRequesterOfApproval(noMgrRequest, senderEmail, logger).catch((err) => {
+          logger?.warn('Failed to send no-manager auto-approval notification', {
+            error: err instanceof Error ? err.message : String(err),
+          });
+        });
+
+        logger?.endOperation('createRequest', startTime, {
+          requestId: noMgrRequest.id,
+          autoApproved: true,
+          reason: 'no-manager',
+          calendarEventId,
+        });
+
+        return noMgrRequest;
+      }
+
+      // Re-throw non-404 manager errors
+      throw managerError;
+    }
 
     // Insert into database
     const sql = `
@@ -362,7 +477,7 @@ async function createCalendarEvent(
   if (!config.vacationCalendarMailbox) {
     throw new ApiError(
       ErrorCodes.ConfigurationError,
-      'Vacation calendar mailbox not configured',
+      'Leave request calendar mailbox not configured',
       500
     );
   }
@@ -376,7 +491,7 @@ async function createCalendarEvent(
   // Include requester as attendee so the shared calendar event can be
   // attributed back to the correct person when reading events later.
   const event = {
-    subject: `${request.requesterName} - ${request.leaveType.charAt(0).toUpperCase() + request.leaveType.slice(1)}`,
+    subject: `${request.requesterName} - ${getLeaveTypeLabel(request.leaveType)}`,
     start: {
       dateTime: `${request.startDate}T00:00:00`,
       timeZone: config.defaultTimezone,
@@ -550,6 +665,8 @@ export async function approveRequest(
 
 /**
  * Cancels a time-off request (by the requester).
+ * Supports cancelling both pending and approved requests.
+ * If the request was approved, the associated Outlook calendar event is also deleted.
  *
  * @param requestId - UUID of the request to cancel
  * @param requesterEmail - Email of the requester (must match)
@@ -576,8 +693,8 @@ export async function cancelRequest(
       );
     }
 
-    // Verify it's still pending
-    if (request.status !== 'pending') {
+    // Only pending and approved requests can be cancelled
+    if (request.status !== 'pending' && request.status !== 'approved') {
       throw new ApiError(
         ErrorCodes.BadRequest,
         `Cannot cancel a request that is already ${request.status}`,
@@ -594,14 +711,21 @@ export async function cancelRequest(
       );
     }
 
-    // Update request status to cancelled
+    // Track whether this was an approved request with a calendar event
+    const hadCalendarEvent = request.status === 'approved' && !!request.calendarEventId;
+    const calendarEventId = request.calendarEventId;
+
+    // Update DB first (optimistic lock via WHERE status check to prevent race conditions).
+    // If a concurrent approve/cancel changed the status, zero rows are returned.
+    // Clear calendar_event_id when cancelling an approved request.
     const updateSql = `
       UPDATE time_off_requests
       SET status = 'cancelled',
           status_changed_at = NOW(),
           status_changed_by = $2,
+          calendar_event_id = CASE WHEN calendar_event_id IS NOT NULL THEN NULL ELSE calendar_event_id END,
           updated_at = NOW()
-      WHERE id = $1
+      WHERE id = $1 AND status IN ('pending', 'approved')
       RETURNING *
     `;
 
@@ -612,12 +736,40 @@ export async function cancelRequest(
     );
 
     if (rows.length === 0) {
-      throw new Error('Update did not return a row');
+      // Status was changed by a concurrent operation (e.g., approved while cancelling)
+      throw new ApiError(
+        ErrorCodes.BadRequest,
+        'Request status has changed. Please refresh and try again.',
+        409
+      );
     }
 
     const updatedRequest = toTimeOffRequest(rows[0]);
 
-    logger?.endOperation('cancelRequest', startTime, { requestId });
+    // After DB is updated, delete the Outlook calendar event if one existed.
+    // Done after DB update so the DB always reflects the correct state.
+    if (hadCalendarEvent && calendarEventId) {
+      try {
+        await deleteCalendarEvent(calendarEventId, logger);
+        logger?.info('Deleted calendar event for cancelled request', {
+          requestId,
+          calendarEventId,
+        });
+      } catch (calendarError) {
+        // Log but don't block — the DB already shows cancelled.
+        // The event may have already been deleted manually from Outlook.
+        logger?.warn('Failed to delete calendar event during cancellation', {
+          requestId,
+          calendarEventId,
+          error: calendarError instanceof Error ? calendarError.message : String(calendarError),
+        });
+      }
+    }
+
+    logger?.endOperation('cancelRequest', startTime, {
+      requestId,
+      hadCalendarEvent: !!request.calendarEventId,
+    });
 
     return updatedRequest;
   } catch (error) {

@@ -14,7 +14,7 @@ const mockConfig = {
   allowedOrigins: ['https://test.staffbase.com', 'https://other.staffbase.com'],
   calendarMode: 'shared',
   vacationCalendarMailbox: 'vacations@test.com',
-  vacationCategory: 'Vacation',
+  vacationCategory: 'Leave Request',
   defaultTimezone: 'UTC',
   maxDateRangeDays: 90,
   logLevel: 'info',

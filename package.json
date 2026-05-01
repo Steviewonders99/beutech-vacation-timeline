@@ -2,7 +2,7 @@
   "name": "beutech-vacation-timeline",
   "version": "1.0.0",
   "private": true,
-  "description": "Staffbase Vacation Timeline Widget + Azure Functions Backend",
+  "description": "Staffbase Leave Request Timeline Widget + Azure Functions Backend",
   "workspaces": [
     "apps/*"
   ],

@@ -78,7 +78,7 @@ export const DEFAULT_CONFIG: Partial<WidgetConfiguration> = {
   calendarMode: 'shared',
   defaultView: 'week',
   darkMode: false,
-  vacationCategory: 'Vacation',
+  vacationCategory: 'Leave Request',
   maxUsers: 20,
   enableOutlookDeepLink: false,
   outlookCalendarUrl: 'https://outlook.office.com/calendar',

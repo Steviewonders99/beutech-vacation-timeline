@@ -63,8 +63,8 @@ export interface VacationTimelineProps extends BlockAttributes, Partial<WidgetCo
 }
 
 /**
- * Main Vacation Timeline widget component.
- * Displays a multi-user vacation timeline with filtering and navigation.
+ * Main Leave Request Timeline widget component.
+ * Displays a multi-user leave request timeline with filtering and navigation.
  */
 export const VacationTimeline = ({
   // Widget configuration (from Staffbase Studio - with production fallbacks)
@@ -104,31 +104,6 @@ export const VacationTimeline = ({
     });
   }, [apiBaseUrl, apiKey, propsApiBaseUrl, calendarMode, sharedCalendarMailbox]);
 
-  // TEMPORARY DEBUG: Call debug endpoint to discover the actual Origin header
-  // DELETE THIS after CORS debugging is complete
-  useEffect(() => {
-    if (!apiBaseUrl) return;
-    const debugUrl = `${apiBaseUrl.replace(/\/$/, '')}/api/debug/headers`;
-    console.log('[VacationTimeline] DEBUG: Calling', debugUrl, 'from origin:', window.location.origin);
-    console.log('[VacationTimeline] DEBUG: window.location =', {
-      href: window.location.href,
-      origin: window.location.origin,
-      hostname: window.location.hostname,
-      protocol: window.location.protocol,
-    });
-    fetch(debugUrl)
-      .then(res => res.json())
-      .then(data => {
-        console.log('[VacationTimeline] DEBUG HEADERS RESPONSE:', JSON.stringify(data, null, 2));
-        console.log('[VacationTimeline] DEBUG ORIGIN SENT:', data.origin);
-        console.log('[VacationTimeline] DEBUG USER-AGENT:', data.userAgent);
-        console.log('[VacationTimeline] DEBUG REFERER:', data.referer);
-      })
-      .catch(err => {
-        console.error('[VacationTimeline] DEBUG endpoint failed:', err.message);
-        console.log('[VacationTimeline] DEBUG: This failure itself may indicate a CORS block');
-      });
-  }, [apiBaseUrl]);
 
   // Initialize i18n with Staffbase language
   const { t } = useLanguage(contentLanguage);
@@ -177,6 +152,40 @@ export const VacationTimeline = ({
   // API key is optional - origin-based auth is used when running in Staffbase
   const hasRequiredConfig = apiBaseUrl || useMockData;
 
+  // Fetch the first future event date to initialize the view
+  const { nextEventDate, isLoading: nextEventLoading } = useNextEventDate({
+    apiConfig,
+    skip: !hasRequiredConfig,
+  });
+
+  // Track if we've already navigated to the first event date
+  const hasNavigatedToNextEvent = useRef(false);
+
+  // Navigate to the first future event date when it loads (only once)
+  useEffect(() => {
+    if (nextEventDate && !hasNavigatedToNextEvent.current && !nextEventLoading) {
+      hasNavigatedToNextEvent.current = true;
+      goToDate(nextEventDate);
+    }
+  }, [nextEventDate, nextEventLoading, goToDate]);
+
+  // Fetch vacation data (before useMyRequests so `refresh` is available as a cancel callback)
+  const {
+    events,
+    users,
+    isLoading: dataLoading,
+    error,
+    refresh,
+  } = useVacationData({
+    apiConfig,
+    startDate: viewRange.start,
+    endDate: viewRange.end,
+    view,
+    selectedUsers: selectedUserIds.length > 0 ? selectedUserIds : undefined,
+    currentUserUpn: m365Upn,
+    skip: !hasRequiredConfig && !useMockData,
+  });
+
   // Time-off request hook
   const {
     submitRequest,
@@ -198,7 +207,7 @@ export const VacationTimeline = ({
     return m365Upn || 'User';
   }, [staffbaseUser, m365Upn]);
 
-  // My requests hook
+  // My requests hook (onCancelSuccess refreshes calendar to remove deleted events)
   const {
     requests: myRequests,
     isLoading: myRequestsLoading,
@@ -210,6 +219,7 @@ export const VacationTimeline = ({
     apiConfig,
     userEmail: m365Upn,
     skip: !hasRequiredConfig || !m365Upn,
+    onCancelSuccess: refresh,
   });
 
   // Check if user is a supervisor (has direct reports in the system)
@@ -233,40 +243,6 @@ export const VacationTimeline = ({
     supervisorEmail: m365Upn,
     // Skip if not configured, no email, or user is not a supervisor
     skip: !hasRequiredConfig || !m365Upn || !isSupervisor,
-  });
-
-  // Fetch the first future event date to initialize the view
-  const { nextEventDate, isLoading: nextEventLoading } = useNextEventDate({
-    apiConfig,
-    skip: !hasRequiredConfig,
-  });
-
-  // Track if we've already navigated to the first event date
-  const hasNavigatedToNextEvent = useRef(false);
-
-  // Navigate to the first future event date when it loads (only once)
-  useEffect(() => {
-    if (nextEventDate && !hasNavigatedToNextEvent.current && !nextEventLoading) {
-      hasNavigatedToNextEvent.current = true;
-      goToDate(nextEventDate);
-    }
-  }, [nextEventDate, nextEventLoading, goToDate]);
-
-  // Fetch vacation data
-  const {
-    events,
-    users,
-    isLoading: dataLoading,
-    error,
-    refresh,
-  } = useVacationData({
-    apiConfig,
-    startDate: viewRange.start,
-    endDate: viewRange.end,
-    view,
-    selectedUsers: selectedUserIds.length > 0 ? selectedUserIds : undefined,
-    currentUserUpn: m365Upn,
-    skip: !hasRequiredConfig && !useMockData,
   });
 
   // Filter users based on selection
@@ -532,7 +508,7 @@ export const VacationTimeline = ({
       {activeTab === 'my-requests' && (
         <div className="vt-widget__content">
           <MyRequests
-            requests={myRequests}
+            requests={myRequests.filter((r) => r.status !== 'cancelled')}
             isLoading={myRequestsLoading}
             error={myRequestsError}
             onRefresh={refreshMyRequests}

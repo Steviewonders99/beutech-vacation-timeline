@@ -27,7 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log error for debugging
-    console.error('Vacation Timeline Widget Error:', error);
+    console.error('Leave Request Timeline Widget Error:', error);
     console.error('Component stack:', errorInfo.componentStack);
 
     // Call optional error handler
@@ -70,7 +70,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </h3>
 
             <p className="vt-error-boundary__message">
-              The vacation timeline couldn&apos;t load properly.
+              The leave timeline couldn&apos;t load properly.
               Please try refreshing the page.
             </p>
 

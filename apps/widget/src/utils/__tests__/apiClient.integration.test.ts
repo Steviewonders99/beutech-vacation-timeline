@@ -74,7 +74,7 @@ describe('API Client Integration', () => {
           userId: 'user1@test.com',
           userDisplayName: 'Test User',
           userColorKey: 'user1@test.com',
-          title: 'Vacation',
+          title: 'Time Off',
           start: '2025-01-10T00:00:00Z',
           end: '2025-01-15T00:00:00Z',
         },
