@@ -3,7 +3,7 @@
  * Supports both shared calendar and per-user calendar modes.
  */
 
-import { graphGetWithParams, graphPost, graphDelete } from './graphClient';
+import { graphGetWithParams, graphPost, graphPatch, graphDelete } from './graphClient';
 import { getConfig } from '../utils/env';
 import { Logger } from '../utils/logger';
 import {
@@ -393,4 +393,75 @@ export async function deleteEventsBySubject(
   }
 
   return { deleted: deletedEvents.length, events: deletedEvents };
+}
+
+/**
+ * Renames calendar events by replacing a substring in the subject.
+ * Used for one-time migrations (e.g. "Vacation" → "Time Off").
+ *
+ * @param searchTerm - Text to search for in event subjects
+ * @param oldText - Substring to replace in matching subjects
+ * @param newText - Replacement substring
+ * @param dryRun - If true, list matches without modifying them
+ * @param logger - Optional logger
+ * @returns Summary of renamed (or would-be-renamed) events
+ */
+export async function renameEventSubjects(
+  searchTerm: string,
+  oldText: string,
+  newText: string,
+  dryRun: boolean,
+  logger?: Logger
+): Promise<{ renamed: number; events: Array<{ id: string; oldSubject: string; newSubject: string }> }> {
+  const config = getConfig();
+
+  if (!config.vacationCalendarMailbox) {
+    throw new ApiError(
+      ErrorCodes.ConfigurationError,
+      'Shared calendar mailbox not configured',
+      500
+    );
+  }
+
+  logger?.info('Searching for events to rename', { searchTerm, oldText, newText, dryRun });
+
+  const endpoint = `/users/${encodeURIComponent(config.vacationCalendarMailbox)}/calendar/events`;
+  const response = await graphGetWithParams<{ value: GraphCalendarEvent[] }>(
+    endpoint,
+    {
+      '$filter': `contains(subject, '${searchTerm}')`,
+      '$select': 'id,subject,start,end',
+      '$top': '200',
+    },
+    logger
+  );
+
+  const events = response.value || [];
+  const renamedEvents: Array<{ id: string; oldSubject: string; newSubject: string }> = [];
+
+  for (const event of events) {
+    if (!event.subject.includes(oldText)) continue;
+
+    const newSubject = event.subject.replace(oldText, newText);
+
+    if (dryRun) {
+      renamedEvents.push({ id: event.id, oldSubject: event.subject, newSubject });
+      continue;
+    }
+
+    try {
+      const eventPath = `/users/${encodeURIComponent(config.vacationCalendarMailbox)}/calendar/events/${encodeURIComponent(event.id)}`;
+      await graphPatch(eventPath, { subject: newSubject }, logger);
+      renamedEvents.push({ id: event.id, oldSubject: event.subject, newSubject });
+      logger?.info('Renamed event', { id: event.id, oldSubject: event.subject, newSubject });
+    } catch (error) {
+      logger?.warn('Failed to rename event', {
+        eventId: event.id,
+        subject: event.subject,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  return { renamed: renamedEvents.length, events: renamedEvents };
 }
