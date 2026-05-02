@@ -200,7 +200,7 @@ describe('VacationTimeline', () => {
         />
       );
 
-      expect(screen.getByText(/No vacations found/i)).toBeInTheDocument();
+      expect(screen.getByText(/No leave found/i)).toBeInTheDocument();
     });
   });
 

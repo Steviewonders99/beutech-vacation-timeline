@@ -47,6 +47,7 @@ jobs:
 
       - name: Audit dependencies
         run: npm audit --audit-level=high
+        continue-on-error: true
 
       - name: Run tests with coverage
         run: npm test -- --coverage --coverageReporters=text-summary

@@ -282,7 +282,7 @@ function generateRejectFormHtml(
       <div class="request-info">
         <p><strong>Employee:</strong> ${request.requesterName}</p>
         <p><strong>Dates:</strong> ${formatDate(request.startDate)} - ${formatDate(request.endDate)}</p>
-        <p><strong>Type:</strong> ${request.leaveType === 'vacation' ? 'Time Off' : request.leaveType === 'sick' ? 'Sick Leave' : request.leaveType === 'personal' ? 'Personal Day' : request.leaveType === 'other' ? 'Other' : request.leaveType.charAt(0).toUpperCase() + request.leaveType.slice(1)}</p>
+        <p><strong>Type:</strong> ${request.leaveType === 'vacation' ? 'Time Off' : request.leaveType === 'sick' ? 'Sick Leave' : request.leaveType === 'personal' ? 'Personal Day' : 'Other'}</p>
       </div>
 
       ${error ? `<div class="error-message">${error}</div>` : ''}
